@@ -416,12 +416,17 @@
     const linksById = new Map();
 
     document.querySelectorAll("[data-scrollspy]").forEach((link) => {
-      linksById.set(link.getAttribute("data-scrollspy"), link);
+      const id = link.getAttribute("data-scrollspy");
+      if (!linksById.has(id)) {
+        linksById.set(id, []);
+      }
+      linksById.get(id).push(link);
     });
 
     const setActive = (id) => {
-      linksById.forEach((link, key) => {
-        link.classList.toggle("is-active", key === id);
+      linksById.forEach((links, key) => {
+        const active = key === id;
+        links.forEach((link) => link.classList.toggle("is-active", active));
       });
     };
 
@@ -456,6 +461,30 @@
       { passive: true }
     );
     updateOnScroll();
+  }
+
+  function openMobileNav() {
+    const sidebar = document.getElementById("left-sidebar");
+    const backdrop = document.getElementById("nav-backdrop");
+    const toggle = document.getElementById("nav-toggle");
+    if (sidebar) sidebar.classList.add("is-open");
+    if (backdrop) {
+      backdrop.hidden = false;
+      backdrop.classList.add("is-open");
+    }
+    if (toggle) toggle.setAttribute("aria-expanded", "true");
+  }
+
+  function closeMobileNav() {
+    const sidebar = document.getElementById("left-sidebar");
+    const backdrop = document.getElementById("nav-backdrop");
+    const toggle = document.getElementById("nav-toggle");
+    if (sidebar) sidebar.classList.remove("is-open");
+    if (backdrop) {
+      backdrop.classList.remove("is-open");
+      backdrop.hidden = true;
+    }
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
   }
 
   function init() {
@@ -544,7 +573,14 @@
     if (searchResetStatus) searchResetStatus.addEventListener("click", resetGlobalSearch);
     if (stepsEmptyReset) stepsEmptyReset.addEventListener("click", resetGlobalSearch);
 
-    document.querySelectorAll(".toc-link").forEach((link) => {
+    const navToggle = document.getElementById("nav-toggle");
+    const navClose = document.getElementById("nav-close");
+    const navBackdrop = document.getElementById("nav-backdrop");
+    if (navToggle) navToggle.addEventListener("click", openMobileNav);
+    if (navClose) navClose.addEventListener("click", closeMobileNav);
+    if (navBackdrop) navBackdrop.addEventListener("click", closeMobileNav);
+
+    document.querySelectorAll("[data-scrollspy]").forEach((link) => {
       link.addEventListener("click", () => {
         const selector = link.getAttribute("href");
         if (!selector) return;
@@ -554,6 +590,7 @@
         if (target.classList.contains("is-hidden")) {
           resetGlobalSearch();
         }
+        closeMobileNav();
         if (target.classList.contains("doc-section")) {
           target.classList.add("is-highlight");
           window.setTimeout(() => target.classList.remove("is-highlight"), 1200);
@@ -582,11 +619,14 @@
         return;
       }
 
-      if (e.key === "Escape" && document.activeElement === searchInput) {
-        if (searchInput.value) {
-          resetGlobalSearch();
-        } else {
-          searchInput.blur();
+      if (e.key === "Escape") {
+        closeMobileNav();
+        if (document.activeElement === searchInput) {
+          if (searchInput.value) {
+            resetGlobalSearch();
+          } else {
+            searchInput.blur();
+          }
         }
       }
     });

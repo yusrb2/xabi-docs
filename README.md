@@ -6,9 +6,9 @@ Static technical documentation for [`xabi`](https://github.com/yusrb2/xabi), a u
 
 ```text
 xabi-docs/
-├── index.html   # Procedural documentation (sections 1-7) and 19-command CLI reference
-├── style.css    # Flat Wikipedia-inspired warm pastel stylesheet
-├── app.js       # OS switcher, completion checklist, terminal simulator, and search filter
+├── index.html   # Three-column procedural documentation and 19-command CLI reference
+├── style.css    # Soft monochrome white-dominant stylesheet with Inter and JetBrains Mono
+├── app.js       # OS switcher, completion checklist, terminal simulator, scrollspy, and search filter
 ├── README.md    # Local preview and GitHub Pages instructions
 └── LICENSE      # GNU General Public License v3.0
 ```
@@ -43,7 +43,7 @@ Open `http://localhost:8080` in a browser.
 
 ## GitHub Pages Deployment
 
-All asset references in `index.html` use relative paths (`style.css?v=5` and `app.js?v=5`) for direct hosting on GitHub Pages:
+All asset references in `index.html` use relative paths (`style.css?v=8` and `app.js?v=8`) for direct hosting on GitHub Pages:
 
 1. Open **Settings** in the `yusrb2/xabi-docs` GitHub repository.
 2. Navigate to **Pages** in the left sidebar.

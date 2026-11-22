@@ -3,32 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>xabi — Technical Documentation</title>
-  <meta name="description" content="Technical reference and procedural guide for xabi, a user-space local web development orchestrator for Linux and Windows.">
+  <title>xabi — Documentation</title>
+  <meta name="description" content="Technical documentation and command reference for xabi, a user-space local web development orchestrator for Linux and Windows.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body data-platform="windows">
   <header class="topbar">
     <div class="topbar-inner">
-      <a href="#overview" class="site-title">xabi &mdash; Technical Documentation</a>
+      <div class="topbar-left">
+        <button id="nav-toggle" class="mobile-nav-btn" type="button" aria-label="Open navigation menu" aria-expanded="false">Menu</button>
+        <a href="#overview" class="wordmark">xabi</a>
+        <nav class="topnav-links" aria-label="Primary navigation">
+          <a href="#overview">Documentation</a>
+          <a href="#step-8">Command Reference</a>
+          <a href="https://github.com/yusrb2/xabi" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
+      </div>
 
-      <div class="topbar-controls">
-        <div class="os-tabs" role="group" aria-label="Target operating system">
-          <button class="os-tab is-active" type="button" data-set-os="windows" aria-pressed="true">Windows</button>
-          <span class="os-sep" aria-hidden="true">|</span>
-          <button class="os-tab" type="button" data-set-os="linux" aria-pressed="false">Linux</button>
+      <div class="topbar-right">
+        <div class="os-switcher" role="group" aria-label="Target operating system">
+          <button class="os-btn is-active" type="button" data-set-os="windows" aria-pressed="true">Windows</button>
+          <span class="os-divider" aria-hidden="true">|</span>
+          <button class="os-btn" type="button" data-set-os="linux" aria-pressed="false">Linux</button>
         </div>
 
-        <div class="progress-inline" aria-label="Guide completion progress">
+        <div class="progress-counter" aria-label="Guide completion progress">
           <span id="progress-text">0/7 completed</span>
-          <button id="progress-reset" class="text-btn" type="button" hidden>Reset</button>
+          <button id="progress-reset" class="text-link-btn" type="button" hidden>Reset</button>
         </div>
 
-        <div class="search-wrap" role="search">
-          <input id="global-search" type="search" placeholder="Search commands, flags, paths..." aria-label="Search documentation">
+        <div class="search-field" role="search">
+          <input id="global-search" type="search" placeholder="Search documentation..." aria-label="Search documentation">
           <kbd id="search-kbd" class="search-kbd">Ctrl+K</kbd>
           <button id="search-clear" class="search-clear" type="button" aria-label="Clear search" hidden>Clear</button>
         </div>
@@ -36,121 +44,103 @@
     </div>
   </header>
 
-  <div class="page-frame">
-    <aside class="toc-sidebar" aria-label="Table of Contents">
-      <p class="toc-heading">Contents</p>
-      <nav>
-        <ol class="toc-list">
-          <li class="toc-item-unnumbered">
-            <a class="toc-link is-active" href="#overview" data-scrollspy="overview">Overview</a>
-          </li>
-          <li class="toc-item-unnumbered">
-            <a class="toc-link" href="#simulator" data-scrollspy="simulator">Terminal Simulator</a>
-          </li>
-          <li>
-            <a class="toc-link" href="#step-1" data-scrollspy="step-1" data-step-nav="1">
-              <span>1. Binary Installation</span>
-              <span class="toc-done-mark" aria-hidden="true">[done]</span>
-            </a>
-          </li>
-          <li>
-            <a class="toc-link" href="#step-2" data-scrollspy="step-2" data-step-nav="2">
-              <span>2. Diagnostics and Initialization</span>
-              <span class="toc-done-mark" aria-hidden="true">[done]</span>
-            </a>
-          </li>
-          <li>
-            <a class="toc-link" href="#step-3" data-scrollspy="step-3" data-step-nav="3">
-              <span>3. Service Orchestration</span>
-              <span class="toc-done-mark" aria-hidden="true">[done]</span>
-            </a>
-          </li>
-          <li>
-            <a class="toc-link" href="#step-4" data-scrollspy="step-4" data-step-nav="4">
-              <span>4. Virtual Hosts and Reverse Proxy</span>
-              <span class="toc-done-mark" aria-hidden="true">[done]</span>
-            </a>
-          </li>
-          <li>
-            <a class="toc-link" href="#step-5" data-scrollspy="step-5" data-step-nav="5">
-              <span>5. Local HTTPS Certificates</span>
-              <span class="toc-done-mark" aria-hidden="true">[done]</span>
-            </a>
-          </li>
-          <li>
-            <a class="toc-link" href="#step-6" data-scrollspy="step-6" data-step-nav="6">
-              <span>6. PHP Version Management</span>
-              <span class="toc-done-mark" aria-hidden="true">[done]</span>
-            </a>
-          </li>
-          <li>
-            <a class="toc-link" href="#step-7" data-scrollspy="step-7" data-step-nav="7">
-              <span>7. Operational Utilities and Shell Completion</span>
-              <span class="toc-done-mark" aria-hidden="true">[done]</span>
-            </a>
-          </li>
-          <li>
-            <a class="toc-link" href="#step-8" data-scrollspy="step-8">
-              <span>8. Command Reference</span>
-            </a>
-          </li>
-        </ol>
+  <div id="nav-backdrop" class="nav-backdrop" hidden></div>
+
+  <div class="docs-layout">
+    <aside id="left-sidebar" class="left-sidebar" aria-label="Documentation navigation">
+      <div class="mobile-sidebar-header">
+        <span class="sidebar-group-title">Navigation</span>
+        <button id="nav-close" class="mobile-nav-btn" type="button" aria-label="Close navigation menu">Close</button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-group">
+          <p class="sidebar-group-title">Getting Started</p>
+          <ul class="sidebar-list">
+            <li>
+              <a class="sidebar-link is-active" href="#overview" data-scrollspy="overview">Overview</a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="#simulator" data-scrollspy="simulator">Terminal Simulator</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-group">
+          <p class="sidebar-group-title">Procedural Guide</p>
+          <ul class="sidebar-list">
+            <li>
+              <a class="sidebar-link" href="#step-1" data-scrollspy="step-1" data-step-nav="1">
+                <span>1. Binary Installation</span>
+                <span class="nav-done" aria-hidden="true">Done</span>
+              </a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="#step-2" data-scrollspy="step-2" data-step-nav="2">
+                <span>2. Diagnostics and Initialization</span>
+                <span class="nav-done" aria-hidden="true">Done</span>
+              </a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="#step-3" data-scrollspy="step-3" data-step-nav="3">
+                <span>3. Service Orchestration</span>
+                <span class="nav-done" aria-hidden="true">Done</span>
+              </a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="#step-4" data-scrollspy="step-4" data-step-nav="4">
+                <span>4. Virtual Hosts and Reverse Proxy</span>
+                <span class="nav-done" aria-hidden="true">Done</span>
+              </a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="#step-5" data-scrollspy="step-5" data-step-nav="5">
+                <span>5. Local HTTPS Certificates</span>
+                <span class="nav-done" aria-hidden="true">Done</span>
+              </a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="#step-6" data-scrollspy="step-6" data-step-nav="6">
+                <span>6. PHP Version Management</span>
+                <span class="nav-done" aria-hidden="true">Done</span>
+              </a>
+            </li>
+            <li>
+              <a class="sidebar-link" href="#step-7" data-scrollspy="step-7" data-step-nav="7">
+                <span>7. Operational Utilities</span>
+                <span class="nav-done" aria-hidden="true">Done</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-group">
+          <p class="sidebar-group-title">Reference</p>
+          <ul class="sidebar-list">
+            <li>
+              <a class="sidebar-link" href="#step-8" data-scrollspy="step-8">8. Command Reference</a>
+            </li>
+          </ul>
+        </div>
       </nav>
     </aside>
 
-    <main class="article-column">
-      <section id="overview" class="article-intro">
-        <h1>xabi</h1>
+    <main class="main-column">
+      <div class="breadcrumb" aria-label="Breadcrumb">Docs / Procedural Guide</div>
 
-        <table class="infobox" aria-label="Project summary">
-          <caption>Summary</caption>
-          <tbody>
-            <tr>
-              <th scope="row">License</th>
-              <td>GNU GPL-3.0</td>
-            </tr>
-            <tr>
-              <th scope="row">Implementation</th>
-              <td>Go standard library</td>
-            </tr>
-            <tr>
-              <th scope="row">Supported Platforms</th>
-              <td>Linux, Windows</td>
-            </tr>
-            <tr>
-              <th scope="row">Active Platform</th>
-              <td class="os-token" data-win="Windows" data-linux="Linux">Windows</td>
-            </tr>
-            <tr>
-              <th scope="row">XDG Config Directory</th>
-              <td><code class="os-token" data-win="%USERPROFILE%\.config\xabi\" data-linux="~/.config/xabi/">%USERPROFILE%\.config\xabi\</code></td>
-            </tr>
-            <tr>
-              <th scope="row">XDG Data Directory</th>
-              <td><code class="os-token" data-win="%USERPROFILE%\.local\share\xabi\" data-linux="~/.local/share/xabi/">%USERPROFILE%\.local\share\xabi\</code></td>
-            </tr>
-            <tr>
-              <th scope="row">XDG Runtime Directory</th>
-              <td><code class="os-token" data-win="%TEMP%\xabi\" data-linux="$XDG_RUNTIME_DIR/xabi/">%TEMP%\xabi\</code></td>
-            </tr>
-            <tr>
-              <th scope="row">Default Ports</th>
-              <td>HTTP <code>80</code>, HTTPS <code>443</code>, DB <code>3306</code></td>
-            </tr>
-          </tbody>
-        </table>
-
+      <section id="overview" class="doc-intro">
+        <h1>xabi Local Development Orchestrator</h1>
         <p>
-          <strong>xabi</strong> is a user-space local environment orchestrator written in Go using only the standard library. It manages native system binaries (<code>nginx</code>, <code>php-fpm</code> or <code>php-cgi.exe</code>, <code>mariadbd</code>, <code>mkcert</code>, and <code>cloudflared</code>) without root system daemons, Windows service wrappers, or container virtualization.
+          <code>xabi</code> is a user-space local web development orchestrator compiled from the Go standard library. It manages native system binaries (<code>nginx</code>, <code>php-fpm</code> or <code>php-cgi.exe</code>, <code>mariadbd</code>, <code>mkcert</code>, and <code>cloudflared</code>) directly under the active user account without root system daemons, Windows service wrappers, or containers.
         </p>
         <p>
-          Configuration, database state, and runtime sockets follow the XDG Base Directory specification. Select <strong>Windows</strong> or <strong>Linux</strong> in the header to update every command, directory path, upstream endpoint, and completion instruction across this document.
+          Configuration, database storage, and runtime sockets follow the XDG Base Directory specification. Select <strong>Windows</strong> or <strong>Linux</strong> in the navigation bar to switch commands, file paths, upstream sockets, and completion instructions across this page.
         </p>
 
-        <table class="data-table xdg-table">
+        <table class="data-table">
           <thead>
             <tr>
-              <th>Directory / Resource</th>
+              <th>XDG Category</th>
               <th>Resolved Path (<span class="os-token" data-win="Windows" data-linux="Linux">Windows</span>)</th>
               <th>Contents</th>
             </tr>
@@ -182,7 +172,7 @@
 
       <section id="simulator" class="doc-section">
         <h2>Terminal Simulator</h2>
-        <p>Select a command below to inspect representative output for the <strong id="sandbox-os-label">Windows</strong> local environment.</p>
+        <p>Select a command to preview representative execution output for the <strong id="sandbox-os-label">Windows</strong> local environment.</p>
 
         <div class="sim-controls" role="group" aria-label="Simulator commands">
           <button class="sim-btn is-active" type="button" data-sim="xabi doctor">xabi doctor</button>
@@ -206,26 +196,27 @@
         </div>
       </section>
 
-      <div id="search-status" class="callout callout-accent" hidden>
+      <div id="search-status" class="callout search-banner" hidden>
         <span id="search-status-text"></span>
-        <button id="search-reset-status" class="text-btn" type="button">Show all sections</button>
+        <button id="search-reset-status" class="text-link-btn" type="button">Show all sections</button>
       </div>
 
       <div id="steps-empty" class="callout" hidden>
         <p>No procedural sections match the current search query.</p>
-        <button id="steps-empty-reset" class="text-btn" type="button">Reset search</button>
+        <button id="steps-empty-reset" class="text-link-btn" type="button">Reset search</button>
       </div>
 
-      <!-- SECTION 1 -->
+      <!-- STEP 1 -->
       <section id="step-1" class="doc-section step-section" data-step="1" data-keywords="binary installation go build make install path xabi.exe ~/.local/bin %userprofile% version">
         <h2>1. Binary Installation</h2>
-        <p>Compile the <code>./cmd/xabi</code> package from source, place the compiled binary in the user executable directory, and register that directory in <code>PATH</code>.</p>
+        <p>Compile <code>./cmd/xabi</code> from source, place the executable in the user binary directory, and configure <code>PATH</code>.</p>
 
         <div class="os-block" data-os="windows">
-          <p>Run the following commands in PowerShell to clone the repository, compile <code>bin\xabi.exe</code>, and copy it into <code>%USERPROFILE%\.local\share\xabi\bin</code>. Placing the binary in this directory keeps it alongside the <code>php.cmd</code> and <code>php-cgi.cmd</code> shims managed by <code>xabi php</code>.</p>
+          <h3>Build and install on Windows</h3>
+          <p>Clone the repository, compile <code>bin\xabi.exe</code>, and copy the executable into <code>%USERPROFILE%\.local\share\xabi\bin</code>. Placing the binary in this directory keeps it alongside the <code>php.cmd</code> and <code>php-cgi.cmd</code> shims generated by <code>xabi php</code>.</p>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-lang">PowerShell &mdash; Build and install binary</span>
+              <span class="code-lang">PowerShell</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
             <pre><code>git clone https://github.com/yusrb2/xabi.git
@@ -237,10 +228,11 @@ New-Item -ItemType Directory -Force $binDir | Out-Null
 Copy-Item .\bin\xabi.exe "$binDir\xabi.exe" -Force</code></pre>
           </div>
 
-          <p>Append <code>%USERPROFILE%\.local\share\xabi\bin</code> to the user <code>PATH</code> environment variable and verify installation in a new terminal session:</p>
+          <h3>Configure user PATH</h3>
+          <p>Append <code>%USERPROFILE%\.local\share\xabi\bin</code> to the user <code>PATH</code> environment variable and verify the binary in a new terminal session:</p>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-lang">PowerShell &mdash; Configure user PATH</span>
+              <span class="code-lang">PowerShell</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
             <pre><code>$binDir = "$env:USERPROFILE\.local\share\xabi\bin"
@@ -254,10 +246,11 @@ xabi version</code></pre>
         </div>
 
         <div class="os-block" data-os="linux">
-          <p>Run <code>make install</code> to build a static binary (<code>CGO_ENABLED=0</code>) and install it to <code>~/.local/bin/xabi</code>. Pass <code>PREFIX=/usr/local</code> to install system-wide.</p>
+          <h3>Build and install on Linux</h3>
+          <p>Execute <code>make install</code> to compile a static binary (<code>CGO_ENABLED=0</code>) and install it to <code>~/.local/bin/xabi</code>. Pass <code>PREFIX=/usr/local</code> for a system-wide installation.</p>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-lang">Bash / Zsh &mdash; Build and install binary</span>
+              <span class="code-lang">Bash / Zsh</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
             <pre><code>git clone https://github.com/yusrb2/xabi.git
@@ -266,10 +259,11 @@ make install
 # System-wide alternative: sudo make PREFIX=/usr/local install</code></pre>
           </div>
 
-          <p>Add both <code>~/.local/bin</code> (the <code>xabi</code> binary) and <code>~/.local/share/xabi/bin</code> (active PHP symlinks) to your shell profile (<code>~/.bashrc</code> or <code>~/.zshrc</code>):</p>
+          <h3>Configure shell PATH</h3>
+          <p>Add both <code>~/.local/bin</code> and <code>~/.local/share/xabi/bin</code> (active PHP symlinks) to your shell profile (<code>~/.bashrc</code> or <code>~/.zshrc</code>):</p>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-lang">Bash / Zsh &mdash; Configure PATH</span>
+              <span class="code-lang">Bash / Zsh</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
             <pre><code>export PATH="$HOME/.local/bin:$HOME/.local/share/xabi/bin:$PATH"
@@ -286,18 +280,19 @@ xabi version</code></pre>
         </div>
       </section>
 
-      <!-- SECTION 2 -->
+      <!-- STEP 2 -->
       <section id="step-2" class="doc-section step-section" data-step="2" data-keywords="diagnostics initialization doctor init dry-run force nginx php-cgi php-fpm mariadb hosts setfacl icacls setcap cap_net_bind_service 80 443 3306">
         <h2>2. Diagnostics and Initialization</h2>
-        <p>Link the required system binaries, create the XDG directory layout, configure write permissions for the system <code>hosts</code> file, and enable unprivileged binding on ports 80 and 443.</p>
+        <p>Link system binaries, provision the XDG directory layout, grant write access on the system <code>hosts</code> file, and verify port availability.</p>
 
-        <p><code>xabi</code> resolves <code>nginx</code> (required) alongside optional binaries (<code>php-fpm</code> or <code>php-cgi</code>, <code>mariadbd</code> or <code>mysqld</code>, <code>mkcert</code>, and <code>cloudflared</code>) by inspecting <code class="os-token" data-win="%USERPROFILE%\.local\share\xabi\bin" data-linux="~/.local/share/xabi/bin">%USERPROFILE%\.local\share\xabi\bin</code>, the <code>PATH</code> environment variable<span class="os-token" data-win="" data-linux=", and system directories /usr/sbin, /sbin, and /usr/local/sbin"></span>.</p>
+        <p><code>xabi</code> locates <code>nginx</code> (required) and optional binaries (<code>php-fpm</code> or <code>php-cgi</code>, <code>mariadbd</code> or <code>mysqld</code>, <code>mkcert</code>, and <code>cloudflared</code>) inside <code class="os-token" data-win="%USERPROFILE%\.local\share\xabi\bin" data-linux="~/.local/share/xabi/bin">%USERPROFILE%\.local\share\xabi\bin</code>, the <code>PATH</code> environment variable<span class="os-token" data-win="" data-linux=", and system paths /usr/sbin, /sbin, and /usr/local/sbin"></span>.</p>
 
         <div class="os-block" data-os="windows">
-          <p>Ensure the directories containing <code>nginx.exe</code>, <code>php-cgi.exe</code>, <code>mariadbd.exe</code>, and <code>mkcert.exe</code> are present in <code>PATH</code>. Standard Windows PHP installations under <code>C:\php*</code>, <code>C:\tools\php*</code>, <code>C:\laragon\bin\php\php-*</code>, Chocolatey, and Scoop are also discovered by <code>xabi php</code>. Run initialization and diagnostics:</p>
+          <h3>Initialize environment and run diagnostics</h3>
+          <p>Verify that the directories containing <code>nginx.exe</code>, <code>php-cgi.exe</code>, <code>mariadbd.exe</code>, and <code>mkcert.exe</code> are available in <code>PATH</code>. Standard PHP installations under <code>C:\php*</code>, <code>C:\tools\php*</code>, <code>C:\laragon\bin\php\php-*</code>, Chocolatey, and Scoop are detected automatically by <code>xabi php</code>.</p>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-lang">PowerShell &mdash; Initialize and verify environment</span>
+              <span class="code-lang">PowerShell</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
             <pre><code># Preview planned directories, templates, and setup steps without modifying disk state
@@ -310,25 +305,27 @@ xabi init
 xabi doctor</code></pre>
           </div>
 
-          <p>Grant Modify permission on <code>C:\Windows\System32\drivers\etc\hosts</code> once from an elevated PowerShell session so <code>xabi add</code> and <code>xabi rm</code> can update local domains without running as Administrator:</p>
+          <h3>Configure hosts file permissions</h3>
+          <p>Grant Modify access on <code>C:\Windows\System32\drivers\etc\hosts</code> once from an elevated PowerShell session so <code>xabi add</code> and <code>xabi rm</code> run without elevation:</p>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-lang">PowerShell (Administrator) &mdash; Grant hosts file ACL</span>
+              <span class="code-lang">PowerShell (Administrator)</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
             <pre><code>icacls "$env:SystemRoot\System32\drivers\etc\hosts" /grant "${env:USERNAME}:(M)"</code></pre>
           </div>
 
           <div class="callout">
-            <strong>Port Binding on Windows:</strong> Windows does not use POSIX capabilities (<code>setcap</code>). If <code>xabi doctor</code> reports port <code>80</code> or <code>443</code> in use, stop conflicting services such as IIS or Apache, or adjust <code>[ports]</code> in <code>%USERPROFILE%\.config\xabi\config.toml</code>.
+            <strong>Port binding on Windows:</strong> Windows does not use POSIX capabilities (<code>setcap</code>). If <code>xabi doctor</code> reports port <code>80</code> or <code>443</code> in use, stop conflicting services such as IIS or Apache, or edit <code>[ports]</code> in <code>%USERPROFILE%\.config\xabi\config.toml</code>.
           </div>
         </div>
 
         <div class="os-block" data-os="linux">
-          <p>Install native packages (<code>nginx</code>, <code>php-fpm</code>, <code>mariadb</code>, <code>mkcert</code>, <code>libcap</code>), grant user write ACL access to <code>/etc/hosts</code> via <code>setfacl</code>, and execute <code>xabi init</code> to create the XDG hierarchy, initialize MariaDB, and apply <code>cap_net_bind_service</code> to <code>nginx</code>:</p>
+          <h3>Configure hosts ACL, capabilities, and initialize</h3>
+          <p>Install native packages (<code>nginx</code>, <code>php-fpm</code>, <code>mariadb</code>, <code>mkcert</code>, <code>libcap</code>), grant user write ACL on <code>/etc/hosts</code> using <code>setfacl</code>, and execute <code>xabi init</code> to provision the XDG hierarchy, initialize MariaDB, and apply <code>cap_net_bind_service</code> to <code>nginx</code>:</p>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-lang">Bash &mdash; Configure hosts ACL, init, setcap, and doctor</span>
+              <span class="code-lang">Bash</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
             <pre><code># Grant write ACL on /etc/hosts to the current user
@@ -340,7 +337,7 @@ xabi init --dry-run
 # Provision XDG directories, config.toml, nginx.conf, MariaDB datadir, setcap, and mkcert CA
 xabi init
 
-# Apply cap_net_bind_service manually if xabi init was run without elevated privileges
+# Apply cap_net_bind_service manually if xabi init ran without privileges
 sudo setcap 'cap_net_bind_service=+ep' "$(readlink -f "$(command -v nginx)")"
 
 # Verify environment readiness
@@ -348,7 +345,8 @@ xabi doctor</code></pre>
           </div>
         </div>
 
-        <p><strong>Initialization Flags and Defaults:</strong> Pass <code>--dry-run</code> to inspect planned actions without disk changes, or <code>--force</code> to overwrite existing <code>config.toml</code>, <code>nginx.conf</code>, and <code>mime.types</code> files. Default <code>config.toml</code> values are <code>tld = "test"</code>, <code>web_server = "nginx"</code>, <code>php_default = "system"</code>, <code>services = ["nginx", "php-fpm", "mariadb"]</code>, and ports <code>80</code>, <code>443</code>, and <code>3306</code>.</p>
+        <h3>Flags and default configuration</h3>
+        <p>Pass <code>--dry-run</code> to inspect planned actions without writing to disk, or <code>--force</code> to overwrite existing <code>config.toml</code>, <code>nginx.conf</code>, and <code>mime.types</code> files. Default <code>config.toml</code> values are <code>tld = "test"</code>, <code>web_server = "nginx"</code>, <code>php_default = "system"</code>, <code>services = ["nginx", "php-fpm", "mariadb"]</code>, and ports <code>80</code>, <code>443</code>, and <code>3306</code>.</p>
 
         <div class="step-footer">
           <label class="step-check">
@@ -358,16 +356,16 @@ xabi doctor</code></pre>
         </div>
       </section>
 
-      <!-- SECTION 3 -->
+      <!-- STEP 3 -->
       <section id="step-3" class="doc-section step-section" data-step="3" data-keywords="service orchestration up status st restart reload down pid rss sighup sigusr2 nginx php-fpm php-cgi mariadb daemon">
         <h2>3. Service Orchestration</h2>
         <p>Start, reload, stop, and inspect the live state of <code>nginx</code>, <code>php-fpm</code> (<code>php-cgi.exe</code> on Windows), and <code>mariadb</code> in user-space.</p>
 
-        <p>Lifecycle commands are idempotent and accept an optional list of service names. In addition to canonical names (<code>nginx</code>, <code>php-fpm</code>, <code>mariadb</code>), the aliases <code>php</code>, <code>php-cgi</code>, <code>mysql</code>, and <code>mysqld</code> are accepted.</p>
+        <p>Lifecycle commands are idempotent and accept an optional list of service names. In addition to canonical names (<code>nginx</code>, <code>php-fpm</code>, <code>mariadb</code>), aliases <code>php</code>, <code>php-cgi</code>, <code>mysql</code>, and <code>mysqld</code> are supported.</p>
 
         <div class="code-block">
           <div class="code-header">
-            <span class="code-lang os-token" data-win="PowerShell &mdash; Manage background services" data-linux="Bash &mdash; Manage background services">PowerShell &mdash; Manage background services</span>
+            <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
             <button class="copy-btn" type="button">Copy</button>
           </div>
           <pre><code># Start all configured services or specific services only
@@ -388,13 +386,13 @@ xabi down</code></pre>
 
         <div class="os-block" data-os="windows">
           <div class="callout">
-            <strong>Windows Process Behavior:</strong> Daemons are spawned in the background with <code>HideWindow</code> and <code>CREATE_NEW_PROCESS_GROUP</code> to prevent console windows. <code>php-cgi.exe</code> binds to <code>127.0.0.1:9000</code> (<code>PHP_FCGI_CHILDREN=4</code>, <code>PHP_FCGI_MAX_REQUESTS=1000</code>), process tree PID and RSS metrics are read via <code>kernel32.dll</code> and <code>psapi.dll</code>, and <code>--reload</code> invokes <code>nginx.exe -s reload</code>.
+            <strong>Windows process behavior:</strong> Daemons are started in the background using <code>HideWindow</code> and <code>CREATE_NEW_PROCESS_GROUP</code> without console windows. <code>php-cgi.exe</code> binds to <code>127.0.0.1:9000</code> (<code>PHP_FCGI_CHILDREN=4</code>, <code>PHP_FCGI_MAX_REQUESTS=1000</code>), PID and process tree RSS metrics are read via <code>kernel32.dll</code> and <code>psapi.dll</code>, and <code>--reload</code> invokes <code>nginx.exe -s reload</code>.
           </div>
         </div>
 
         <div class="os-block" data-os="linux">
           <div class="callout">
-            <strong>Linux Process Behavior:</strong> Daemons are detached using <code>Setsid: true</code>, PID and process tree RSS memory are inspected directly from <code>/proc/&lt;pid&gt;</code> with automatic orphan PID cleanup, <code>--reload</code> dispatches <code>SIGHUP</code> to Nginx and <code>SIGUSR2</code> to PHP-FPM, and <code>xabi down</code> sends <code>SIGTERM</code> (with <code>SIGKILL</code> fallback) before removing <code>.pid</code> and <code>.sock</code> files.
+            <strong>Linux process behavior:</strong> Daemons are detached with <code>Setsid: true</code>, PID and process tree RSS memory are read directly from <code>/proc/&lt;pid&gt;</code> with orphan PID recovery, <code>--reload</code> sends <code>SIGHUP</code> to Nginx and <code>SIGUSR2</code> to PHP-FPM, and <code>xabi down</code> sends <code>SIGTERM</code> (with <code>SIGKILL</code> fallback) before removing <code>.pid</code> and <code>.sock</code> files.
           </div>
         </div>
 
@@ -406,20 +404,20 @@ xabi down</code></pre>
         </div>
       </section>
 
-      <!-- SECTION 4 -->
+      <!-- STEP 4 -->
       <section id="step-4" class="doc-section step-section" data-step="4" data-keywords="virtual host reverse proxy add ls open rm laravel public static html websocket dir php sites.toml">
         <h2>4. Virtual Hosts and Reverse Proxy</h2>
-        <p>Register local <code>*.test</code> domains, configure reverse proxies with WebSocket upgrade headers, and manage registered site definitions.</p>
+        <p>Register local <code>*.test</code> domains, configure reverse proxies with WebSocket upgrade headers, and manage site entries.</p>
 
         <ul class="prose-list">
-          <li><strong>Project Auto-Detection:</strong> When <code>public/index.php</code> exists, <code>xabi add</code> configures a PHP virtual host pointing the document root to the <code>/public</code> subdirectory (Laravel/Symfony). If <code>index.php</code>, <code>--php</code>, or a <code>.php-version</code> file is present, the project root is configured for PHP; otherwise it is served as static HTML (<code>try_files $uri $uri/ =404</code>).</li>
-          <li><strong>WebSocket Reverse Proxy:</strong> Passing <code>--proxy &lt;port|host:port&gt;</code> (for example <code>3000</code>, <code>:3000</code>, or <code>127.0.0.1:8080</code>) renders an Nginx location block with <code>proxy_http_version 1.1</code>, <code>Upgrade $http_upgrade</code>, <code>Connection "upgrade"</code>, and <code>X-Forwarded-*</code> headers.</li>
-          <li><strong>Atomic Registration:</strong> Writes the virtual host configuration at <code class="os-token" data-win="%USERPROFILE%\.config\xabi\nginx\sites\&lt;domain&gt;.conf" data-linux="~/.config/xabi/nginx/sites/&lt;domain&gt;.conf">%USERPROFILE%\.config\xabi\nginx\sites\&lt;domain&gt;.conf</code>, updates <code>sites.toml</code>, injects <code>127.0.0.1 &lt;domain&gt;</code> into the <code># BEGIN xabi</code> block of the hosts file, and reloads Nginx if running.</li>
+          <li><strong>Project auto-detection:</strong> When <code>public/index.php</code> exists, <code>xabi add</code> configures a PHP virtual host targeting the <code>/public</code> subdirectory (Laravel/Symfony). If <code>index.php</code>, <code>--php</code>, or a <code>.php-version</code> file exists, the directory is configured for PHP; otherwise it is served as static HTML (<code>try_files $uri $uri/ =404</code>).</li>
+          <li><strong>WebSocket reverse proxy:</strong> Passing <code>--proxy &lt;port|host:port&gt;</code> (for example <code>3000</code>, <code>:3000</code>, or <code>127.0.0.1:8080</code>) renders an Nginx location block with <code>proxy_http_version 1.1</code>, <code>Upgrade $http_upgrade</code>, <code>Connection "upgrade"</code>, and <code>X-Forwarded-*</code> headers.</li>
+          <li><strong>Atomic registration:</strong> Writes the virtual host file at <code class="os-token" data-win="%USERPROFILE%\.config\xabi\nginx\sites\&lt;domain&gt;.conf" data-linux="~/.config/xabi/nginx/sites/&lt;domain&gt;.conf">%USERPROFILE%\.config\xabi\nginx\sites\&lt;domain&gt;.conf</code>, updates <code>sites.toml</code>, injects <code>127.0.0.1 &lt;domain&gt;</code> into the <code># BEGIN xabi</code> block of the hosts file, and reloads Nginx if running.</li>
         </ul>
 
         <div class="code-block">
           <div class="code-header">
-            <span class="code-lang os-token" data-win="PowerShell &mdash; Register, list, open, and remove sites" data-linux="Bash &mdash; Register, list, open, and remove sites">PowerShell &mdash; Register, list, open, and remove sites</span>
+            <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
             <button class="copy-btn" type="button">Copy</button>
           </div>
           <pre><code># Register the current directory (domain defaults to sanitized directory name -&gt; laravel-app.test)
@@ -447,16 +445,16 @@ xabi rm myapp</code></pre>
         </div>
       </section>
 
-      <!-- SECTION 5 -->
+      <!-- STEP 5 -->
       <section id="step-5" class="doc-section step-section" data-step="5" data-keywords="https tls ssl mkcert redirect 301 off disable">
         <h2>5. Local HTTPS Certificates</h2>
-        <p>Issue locally trusted TLS certificates via <code>mkcert</code> and configure automatic HTTP-to-HTTPS <code>301</code> redirects for registered domains.</p>
+        <p>Issue locally trusted TLS certificates via <code>mkcert</code> and enable automatic HTTP-to-HTTPS <code>301</code> redirects for registered domains.</p>
 
-        <p>Executing <code>xabi tls</code> generates <code>&lt;domain&gt;.pem</code> and <code>&lt;domain&gt;-key.pem</code> (covering <code>&lt;domain&gt;</code> and wildcard <code>*.&lt;domain&gt;</code>) inside <code class="os-token" data-win="%USERPROFILE%\.config\xabi\certs\" data-linux="~/.config/xabi/certs/">%USERPROFILE%\.config\xabi\certs\</code>. The Nginx virtual host configuration is updated with <code>return 301 https://$host$request_uri;</code> on the HTTP listener and <code>listen 443 ssl;</code> on HTTPS, followed by an Nginx reload.</p>
+        <p>Executing <code>xabi tls</code> generates <code>&lt;domain&gt;.pem</code> and <code>&lt;domain&gt;-key.pem</code> (covering <code>&lt;domain&gt;</code> and wildcard <code>*.&lt;domain&gt;</code>) inside <code class="os-token" data-win="%USERPROFILE%\.config\xabi\certs\" data-linux="~/.config/xabi/certs/">%USERPROFILE%\.config\xabi\certs\</code>. The Nginx virtual host file is updated with <code>return 301 https://$host$request_uri;</code> on HTTP and <code>listen 443 ssl;</code> on HTTPS, followed by an Nginx reload.</p>
 
         <div class="code-block">
           <div class="code-header">
-            <span class="code-lang os-token" data-win="PowerShell &mdash; Enable and disable local HTTPS" data-linux="Bash &mdash; Enable and disable local HTTPS">PowerShell &mdash; Enable and disable local HTTPS</span>
+            <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
             <button class="copy-btn" type="button">Copy</button>
           </div>
           <pre><code># Enable TLS for the site matching the current working directory or a named site
@@ -468,8 +466,8 @@ xabi tls myapp --off
 # Alias: xabi tls myapp --disable</code></pre>
         </div>
 
-        <div class="callout callout-sage">
-          <strong>Root CA Trust:</strong> The local certificate authority is installed by <code>mkcert -install</code> during <code>xabi init</code>. If a browser reports an untrusted certificate, re-run <code>mkcert -install</code> and restart the browser process.
+        <div class="callout">
+          <strong>Root CA trust:</strong> The local certificate authority is installed by <code>mkcert -install</code> during <code>xabi init</code>. If a browser reports an untrusted certificate, re-run <code>mkcert -install</code> and restart the browser process.
         </div>
 
         <div class="step-footer">
@@ -480,14 +478,14 @@ xabi tls myapp --off
         </div>
       </section>
 
-      <!-- SECTION 6 -->
+      <!-- STEP 6 -->
       <section id="step-6" class="doc-section step-section" data-step="6" data-keywords="php version management .php-version use pin 9000 9083 php.sock fastcgi upstream shim symlink">
         <h2>6. PHP Version Management</h2>
         <p>Inspect installed PHP runtimes, switch the global PHP version, or pin an isolated PHP version per project using <code>.php-version</code>.</p>
 
         <div class="code-block">
           <div class="code-header">
-            <span class="code-lang os-token" data-win="PowerShell &mdash; List, switch, and pin PHP versions" data-linux="Bash &mdash; List, switch, and pin PHP versions">PowerShell &mdash; List, switch, and pin PHP versions</span>
+            <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
             <button class="copy-btn" type="button">Copy</button>
           </div>
           <pre><code># List detected PHP installations (* indicates active global) and project .php-version
@@ -502,6 +500,7 @@ cd <span class="os-token" data-win="C:\Dev\api" data-linux="~/code/api">C:\Dev\a
 xabi php pin 8.3</code></pre>
         </div>
 
+        <h3>Platform upstream isolation</h3>
         <div class="os-block" data-os="windows">
           <table class="data-table">
             <thead>
@@ -512,11 +511,11 @@ xabi php pin 8.3</code></pre>
             </thead>
             <tbody>
               <tr>
-                <td>Upstream Isolation</td>
+                <td>Upstream isolation</td>
                 <td>Global default listens on <code>127.0.0.1:9000</code>. Pinned versions map deterministically to <code>127.0.0.1:90xx</code> using <code>9000 + major*10 + minor</code> (for example, PHP <code>8.1</code> &rarr; <code>9081</code>, <code>8.2</code> &rarr; <code>9082</code>, <code>8.3</code> &rarr; <code>9083</code>, <code>8.4</code> &rarr; <code>9084</code>).</td>
               </tr>
               <tr>
-                <td>Discovery &amp; Shims</td>
+                <td>Discovery and shims</td>
                 <td>Scans <code>%USERPROFILE%\.local\share\xabi\php\&lt;ver&gt;</code>, <code>C:\php*</code>, <code>C:\tools\php*</code>, <code>C:\laragon\bin\php\php-*</code>, Chocolatey, Scoop, and <code>PATH</code>. Switching the global version writes <code>php.cmd</code> and <code>php-cgi.cmd</code> shims in <code>BinDir</code>.</td>
               </tr>
             </tbody>
@@ -533,11 +532,11 @@ xabi php pin 8.3</code></pre>
             </thead>
             <tbody>
               <tr>
-                <td>Upstream Isolation</td>
+                <td>Upstream isolation</td>
                 <td>Global default listens on <code>unix:$XDG_RUNTIME_DIR/xabi/php.sock</code>. Pinned versions spawn dedicated pools configured in <code>~/.config/xabi/php/php-&lt;ver&gt;.conf</code> listening on <code>unix:$XDG_RUNTIME_DIR/xabi/php-&lt;ver&gt;.sock</code> (for example, <code>php-8.3.sock</code>).</td>
               </tr>
               <tr>
-                <td>Discovery &amp; Symlinks</td>
+                <td>Discovery and symlinks</td>
                 <td>Scans <code>~/.local/share/xabi/php/&lt;ver&gt;</code>, <code>PATH</code>, <code>/usr/bin</code>, <code>/usr/local/bin</code>, and <code>/usr/sbin</code>. Switching the global version atomically updates the <code>php</code> and <code>php-fpm</code> symlinks in <code>~/.local/share/xabi/bin/</code>.</td>
               </tr>
             </tbody>
@@ -554,14 +553,15 @@ xabi php pin 8.3</code></pre>
         </div>
       </section>
 
-      <!-- SECTION 7 -->
+      <!-- STEP 7 -->
       <section id="step-7" class="doc-section step-section" data-step="7" data-keywords="operational utilities conf log share db completion bash zsh fish powershell editor cloudflared ngrok mariadb mysql">
-        <h2>7. Operational Utilities and Shell Completion</h2>
+        <h2>7. Operational Utilities</h2>
         <p>Open raw configuration files, stream service logs, expose local sites over public tunnels, manage MariaDB databases, and generate shell completion scripts.</p>
 
+        <h3>Configuration, logs, tunnels, and database</h3>
         <div class="code-block">
           <div class="code-header">
-            <span class="code-lang os-token" data-win="PowerShell &mdash; Configuration, logs, tunnels, and database" data-linux="Bash &mdash; Configuration, logs, tunnels, and database">PowerShell &mdash; Configuration, logs, tunnels, and database</span>
+            <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
             <button class="copy-btn" type="button">Copy</button>
           </div>
           <pre><code># Open config.toml, nginx.conf, PHP config, sites.toml, or a site vhost in $EDITOR
@@ -585,11 +585,12 @@ xabi db shell myapp_db
 xabi db drop myapp_db --force</code></pre>
         </div>
 
+        <h3>Shell completion</h3>
         <div class="os-block" data-os="windows">
           <p>Load dynamic PowerShell completion (covering commands, services, and registered site names from <code>xabi ls</code>) for the current session or persist it in <code>$PROFILE</code>:</p>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-lang">PowerShell &mdash; Shell completion setup</span>
+              <span class="code-lang">PowerShell</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
             <pre><code># Evaluate in the active PowerShell session
@@ -604,7 +605,7 @@ Add-Content -Path $PROFILE -Value "`nxabi completion powershell | Out-String | I
           <p>Generate and install shell completion scripts for Bash, Zsh, or Fish (covering commands, services, and dynamic site names from <code>xabi ls</code>):</p>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-lang">Bash / Zsh / Fish &mdash; Shell completion setup</span>
+              <span class="code-lang">Bash / Zsh / Fish</span>
               <button class="copy-btn" type="button">Copy</button>
             </div>
             <pre><code># Bash
@@ -629,7 +630,7 @@ xabi completion fish &gt; ~/.config/fish/completions/xabi.fish</code></pre>
         </div>
       </section>
 
-      <!-- SECTION 8 -->
+      <!-- STEP 8 -->
       <section id="step-8" class="doc-section">
         <h2>8. Command Reference</h2>
         <p>Complete reference for all 19 commands registered in <code>cmd/xabi</code> and <code>internal/commands</code>.</p>
@@ -744,7 +745,7 @@ xabi completion fish &gt; ~/.config/fish/completions/xabi.fish</code></pre>
       </section>
 
       <footer class="doc-footer">
-        <span>xabi Technical Documentation &bull; GNU GPL-3.0</span>
+        <span>xabi Documentation &bull; GNU GPL-3.0</span>
         <div class="footer-links">
           <span>Shortcuts: <kbd>Ctrl+K</kbd> / <kbd>/</kbd> search, <kbd>Esc</kbd> clear</span>
           <a href="https://github.com/yusrb2/xabi" target="_blank" rel="noopener noreferrer">yusrb2/xabi</a>
@@ -752,8 +753,24 @@ xabi completion fish &gt; ~/.config/fish/completions/xabi.fish</code></pre>
         </div>
       </footer>
     </main>
+
+    <aside class="right-sidebar" aria-label="On this page">
+      <p class="toc-title">On this page</p>
+      <ul class="toc-list">
+        <li><a class="toc-link is-active" href="#overview" data-scrollspy="overview">Overview</a></li>
+        <li><a class="toc-link" href="#simulator" data-scrollspy="simulator">Terminal Simulator</a></li>
+        <li><a class="toc-link" href="#step-1" data-scrollspy="step-1">1. Binary Installation</a></li>
+        <li><a class="toc-link" href="#step-2" data-scrollspy="step-2">2. Diagnostics and Initialization</a></li>
+        <li><a class="toc-link" href="#step-3" data-scrollspy="step-3">3. Service Orchestration</a></li>
+        <li><a class="toc-link" href="#step-4" data-scrollspy="step-4">4. Virtual Hosts and Reverse Proxy</a></li>
+        <li><a class="toc-link" href="#step-5" data-scrollspy="step-5">5. Local HTTPS Certificates</a></li>
+        <li><a class="toc-link" href="#step-6" data-scrollspy="step-6">6. PHP Version Management</a></li>
+        <li><a class="toc-link" href="#step-7" data-scrollspy="step-7">7. Operational Utilities</a></li>
+        <li><a class="toc-link" href="#step-8" data-scrollspy="step-8">8. Command Reference</a></li>
+      </ul>
+    </aside>
   </div>
 
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
