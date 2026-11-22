@@ -1,70 +1,55 @@
-# xabi docs
+# xabi Documentation
 
-Dokumentasi web interaktif dan prosedural untuk [`xabi`](https://github.com/yusrb2/xabi) — local web dev orchestrator minimalis berbasis Go standard library di Linux dan Windows.
+Static technical documentation for [`xabi`](https://github.com/yusrb2/xabi), a user-space local web development orchestrator for Linux and Windows. This site consists of plain HTML, CSS, and Vanilla JavaScript with no build step or Node.js dependency.
 
-Proyek ini dibuat murni dengan HTML, CSS, dan Vanilla JavaScript tanpa *build step*, tanpa Node/NPM, dan langsung siap dijalankan secara lokal maupun melalui GitHub Pages.
-
-## Fitur Dokumentasi
-
-- **Global OS Switcher (`Windows PowerShell` / `Linux Bash/Zsh`):** Mengubah perintah instalasi, path XDG, socket/port PHP FastCGI, izin file `hosts`, dan shell completion secara instan (`localStorage`).
-- **Panduan Prosedural 7 Langkah:** Alur berurutan dari build & instalasi hingga utilitas harian, lengkap dengan checklist `"Tandai Selesai"` dan progress bar di header.
-- **Terminal Sandbox Interaktif:** Simulasi perintah `xabi` (`doctor`, `up`, `status`, `add`, `tls`, `php`, `ls`) dengan output realistis menyesuaikan OS aktif.
-- **Pencarian Cepat (`Ctrl+K` / `/`) & Scrollspy:** Navigasi daftar isi otomatis, filter subcommand real-time, serta tombol satu-klik `Copy` di setiap blok kode.
-
-## Struktur File
+## Repository Layout
 
 ```text
 xabi-docs/
-├── index.html   # Halaman utama dokumentasi prosedural (7 langkah + cheat sheet)
-├── style.css    # Desain dark clean developer docs yang responsif
-├── app.js       # Logika OS switcher, checklist, terminal simulator, & search
-├── README.md    # Panduan lokal & aktivasi GitHub Pages
+├── index.html   # Procedural documentation (sections 1-7) and 19-command CLI reference
+├── style.css    # Flat Wikipedia-inspired warm pastel stylesheet
+├── app.js       # OS switcher, completion checklist, terminal simulator, and search filter
+├── README.md    # Local preview and GitHub Pages instructions
 └── LICENSE      # GNU General Public License v3.0
 ```
 
-## Menjalankan Secara Lokal
+## Local Preview
 
-Karena tidak ada tahap kompilasi atau bundler, kamu bisa preview dengan cara paling sederhana:
+### Serving with `xabi`
 
-### 1. Langsung menggunakan `xabi` (Direkomendasikan)
-
-Jika `xabi` sudah terpasang di mesin lokal:
+Run the following commands from the root of the `xabi-docs` directory to register the site as a local virtual host:
 
 ```sh
-cd xabi-docs
 xabi up
 xabi add xabi-docs
 xabi open xabi-docs
 ```
 
-Situs akan langsung aktif sebagai static vhost di `http://xabi-docs.test` (atau tambahkan `xabi tls xabi-docs` untuk HTTPS lokal).
-
-### 2. Server HTTP Statis Sederhana
-
-Atau jalankan server statis lokal sementara:
+To enable local HTTPS via `mkcert`:
 
 ```sh
-# Python 3
-python -m http.server 8080
-
-# Atau Go / PHP built-in server
-php -S 127.0.0.1:8080
+xabi tls xabi-docs
 ```
 
-Lalu buka `http://localhost:8080` di browser.
+### Serving with Python HTTP Server
 
-## Aktivasi GitHub Pages
+Alternatively, serve the directory on a temporary local port:
 
-Setelah repositori di-push ke GitHub (`yusrb2/xabi-docs`):
+```sh
+python -m http.server 8080
+```
 
-1. Buka repositori di GitHub, lalu masuk ke tab **Settings**.
-2. Pada sidebar kiri, pilih **Pages** (di bagian *Code and automation*).
-3. Di bagian **Build and deployment**:
-   - **Source:** pilih `Deploy from a branch`
-   - **Branch:** pilih `main` dan folder `/ (root)`, lalu klik **Save**.
-4. Tunggu 1–2 menit hingga GitHub Actions selesai mempublikasikan halaman. URL dokumentasi akan tersedia di:
-   `https://yusrb2.github.io/xabi-docs/`
+Open `http://localhost:8080` in a browser.
 
-## Lisensi
+## GitHub Pages Deployment
 
-Selaras dengan repositori utama `xabi`, proyek dokumentasi ini dilisensikan di bawah [GNU GPL-3.0](LICENSE).
+All asset references in `index.html` use relative paths (`style.css?v=5` and `app.js?v=5`) for direct hosting on GitHub Pages:
+
+1. Open **Settings** in the `yusrb2/xabi-docs` GitHub repository.
+2. Navigate to **Pages** in the left sidebar.
+3. Under **Build and deployment**, select **GitHub Actions** (or **Deploy from a branch** on `main` at `/ (root)`).
+4. Once deployment finishes, the documentation is served at `https://yusrb2.github.io/xabi-docs/`.
+
+## License
+
+Licensed under the [GNU GPL-3.0](LICENSE), matching the main `yusrb2/xabi` repository.

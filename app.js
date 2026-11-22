@@ -12,7 +12,7 @@
     searchQuery: "",
   };
 
-  // Realistic simulated CLI outputs synced to actual xabi source code (v0.1.0)
+  // Simulated CLI output aligned with cmd/xabi and internal/commands implementations
   const SIM_OUTPUTS = {
     "xabi doctor": {
       windows: [
@@ -59,31 +59,6 @@
         { type: "info", text: ":: system ready" },
       ],
     },
-    "xabi init --dry-run": {
-      windows: [
-        { type: "step", text: "==> dry-run mode: no files or system state will be modified" },
-        { type: "info", text: ":: would ensure XDG directories under C:\\Users\\dev\\.config\\xabi, C:\\Users\\dev\\.local\\share\\xabi, C:\\Users\\dev\\AppData\\Local\\Temp\\xabi" },
-        { type: "info", text: ":: would write C:\\Users\\dev\\.config\\xabi\\config.toml" },
-        { type: "info", text: ":: would write C:\\Users\\dev\\.config\\xabi\\nginx\\nginx.conf" },
-        { type: "info", text: ":: would write C:\\Users\\dev\\.config\\xabi\\nginx\\mime.types" },
-        { type: "info", text: ":: would run C:\\Program Files\\MariaDB 11.4\\bin\\mariadb-install-db.exe --datadir=C:\\Users\\dev\\.local\\share\\xabi\\db" },
-        { type: "info", text: ":: would run C:\\Users\\dev\\scoop\\shims\\mkcert.exe -install" },
-        { type: "info", text: ":: detected php runtime at C:\\laragon\\bin\\php\\php-8.3.14\\php-cgi.exe" },
-        { type: "info", text: ":: xabi initialized (run 'xabi doctor' to verify)" },
-      ],
-      linux: [
-        { type: "step", text: "==> dry-run mode: no files or system state will be modified" },
-        { type: "info", text: ":: would ensure XDG directories under /home/dev/.config/xabi, /home/dev/.local/share/xabi, /run/user/1000/xabi" },
-        { type: "info", text: ":: would write /home/dev/.config/xabi/config.toml" },
-        { type: "info", text: ":: would write /home/dev/.config/xabi/nginx/nginx.conf" },
-        { type: "info", text: ":: would write /home/dev/.config/xabi/nginx/mime.types" },
-        { type: "info", text: ":: would grant cap_net_bind_service=+ep on /usr/bin/nginx" },
-        { type: "info", text: ":: would run /usr/bin/mariadb-install-db --datadir=/home/dev/.local/share/xabi/db" },
-        { type: "info", text: ":: would run /usr/bin/mkcert -install" },
-        { type: "info", text: ":: detected php runtime at /usr/bin/php-fpm" },
-        { type: "info", text: ":: xabi initialized (run 'xabi doctor' to verify)" },
-      ],
-    },
     "xabi up": {
       windows: [
         { type: "info", text: ":: started nginx (pid 14820)" },
@@ -113,13 +88,13 @@
     "xabi add myapp --proxy 3000": {
       windows: [
         { type: "info", text: ":: linked http://myapp.test -> http://127.0.0.1:3000" },
-        { type: "dim", text: "   vhost : C:\\Users\\dev\\.config\\xabi\\nginx\\sites\\myapp.test.conf (WebSocket Upgrade enabled)" },
+        { type: "dim", text: "   vhost : C:\\Users\\dev\\.config\\xabi\\nginx\\sites\\myapp.test.conf (WebSocket Upgrade)" },
         { type: "dim", text: "   hosts : injected '127.0.0.1 myapp.test' inside # BEGIN xabi" },
         { type: "dim", text: "   nginx : reloaded (nginx -s reload)" },
       ],
       linux: [
         { type: "info", text: ":: linked http://myapp.test -> http://127.0.0.1:3000" },
-        { type: "dim", text: "   vhost : /home/dev/.config/xabi/nginx/sites/myapp.test.conf (WebSocket Upgrade enabled)" },
+        { type: "dim", text: "   vhost : /home/dev/.config/xabi/nginx/sites/myapp.test.conf (WebSocket Upgrade)" },
         { type: "dim", text: "   hosts : injected '127.0.0.1 myapp.test' inside # BEGIN xabi" },
         { type: "dim", text: "   nginx : reloaded (SIGHUP)" },
       ],
@@ -150,18 +125,6 @@
         { type: "info", text: ":: project .php-version: 8.3" },
       ],
     },
-    "xabi php pin 8.3": {
-      windows: [
-        { type: "dim", text: "   file    : .php-version -> 8.3" },
-        { type: "dim", text: "   fastcgi : fastcgi_pass 127.0.0.1:9083;" },
-        { type: "info", text: ":: pinned PHP 8.3 for api.test (.php-version)" },
-      ],
-      linux: [
-        { type: "dim", text: "   file    : .php-version -> 8.3" },
-        { type: "dim", text: "   fastcgi : fastcgi_pass unix:/run/user/1000/xabi/php-8.3.sock;" },
-        { type: "info", text: ":: pinned PHP 8.3 for api.test (.php-version)" },
-      ],
-    },
     "xabi ls": {
       windows: [
         { type: "dim", text: "DOMAIN         TARGET                                   TLS  PHP" },
@@ -185,26 +148,23 @@
         return saved;
       }
     } catch (_) {
-      // Ignore storage failures in restricted contexts
+      // Ignore storage restrictions
     }
     const ua = (navigator.userAgent || "").toLowerCase();
     const plat = (navigator.platform || "").toLowerCase();
-    if (plat.includes("win") || ua.includes("windows")) {
-      return "windows";
-    }
-    return "linux";
+    return plat.includes("win") || ua.includes("windows") ? "windows" : "linux";
   }
 
   function loadCompletedSteps() {
     try {
       const raw = localStorage.getItem(STORAGE_STEPS);
       if (!raw) return new Set();
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) {
-        return new Set(arr.map(String).filter((n) => Number(n) >= 1 && Number(n) <= TOTAL_STEPS));
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return new Set(parsed.map(String).filter((n) => Number(n) >= 1 && Number(n) <= TOTAL_STEPS));
       }
     } catch (_) {
-      // Ignore invalid JSON
+      // Ignore malformed JSON
     }
     return new Set();
   }
@@ -236,7 +196,7 @@
 
     const sandboxLabel = document.getElementById("sandbox-os-label");
     if (sandboxLabel) {
-      sandboxLabel.textContent = state.os === "windows" ? "Windows PowerShell" : "Linux Bash/Zsh";
+      sandboxLabel.textContent = state.os === "windows" ? "Windows" : "Linux";
     }
 
     if (persist) {
@@ -252,49 +212,43 @@
 
   function updateProgressUI() {
     const doneCount = state.completedSteps.size;
-    const pct = Math.round((doneCount / TOTAL_STEPS) * 100);
 
     const progressText = document.getElementById("progress-text");
-    const progressFill = document.getElementById("progress-fill");
+    const progressReset = document.getElementById("progress-reset");
+
     if (progressText) {
-      progressText.textContent = `${doneCount}/${TOTAL_STEPS} Steps`;
+      progressText.textContent = `${doneCount}/${TOTAL_STEPS} completed`;
     }
-    if (progressFill) {
-      progressFill.style.width = `${pct}%`;
+    if (progressReset) {
+      progressReset.hidden = doneCount === 0;
     }
 
-    document.querySelectorAll(".step-card").forEach((card) => {
-      const stepId = card.getAttribute("data-step");
+    document.querySelectorAll(".step-section").forEach((section) => {
+      const stepId = section.getAttribute("data-step");
       const isDone = state.completedSteps.has(stepId);
-      card.classList.toggle("is-done", isDone);
+      section.classList.toggle("is-done", isDone);
 
-      const marker = card.querySelector(".step-marker");
-      if (marker) {
-        marker.textContent = isDone ? "✓" : stepId.padStart(2, "0");
+      const checkbox = section.querySelector("[data-toggle-step]");
+      if (checkbox) {
+        checkbox.checked = isDone;
       }
-
-      const btn = card.querySelector("[data-toggle-step]");
-      if (btn) {
-        btn.setAttribute("aria-pressed", String(isDone));
-        const label = btn.querySelector(".done-label");
-        if (label) {
-          label.textContent = isDone ? "Selesai" : "Tandai Selesai";
-        }
+      const label = section.querySelector(".check-label");
+      if (label) {
+        label.textContent = isDone ? "Completed" : "Mark step as completed";
       }
     });
 
     document.querySelectorAll("[data-step-nav]").forEach((link) => {
       const stepId = link.getAttribute("data-step-nav");
-      const isDone = state.completedSteps.has(stepId);
-      link.classList.toggle("is-done", isDone);
+      link.classList.toggle("is-done", state.completedSteps.has(stepId));
     });
   }
 
-  function toggleStep(stepId) {
-    if (state.completedSteps.has(stepId)) {
-      state.completedSteps.delete(stepId);
-    } else {
+  function setStepCompleted(stepId, completed) {
+    if (completed) {
       state.completedSteps.add(stepId);
+    } else {
+      state.completedSteps.delete(stepId);
     }
     saveCompletedSteps();
     updateProgressUI();
@@ -366,7 +320,7 @@
         await navigator.clipboard.writeText(text);
         return true;
       } catch (_) {
-        // Fallback below
+        // Fallback to textarea copy in non-secure contexts
       }
     }
     const ta = document.createElement("textarea");
@@ -388,12 +342,12 @@
 
   function flashCopied(btn, originalText) {
     btn.classList.add("is-copied");
-    btn.textContent = "Copied!";
+    btn.textContent = "Copied";
     window.clearTimeout(btn._copyTimer);
     btn._copyTimer = window.setTimeout(() => {
       btn.classList.remove("is-copied");
       btn.textContent = originalText;
-    }, 1600);
+    }, 1500);
   }
 
   function applyGlobalSearch(rawQuery) {
@@ -406,19 +360,15 @@
     if (kbdHint) kbdHint.hidden = query.length > 0;
 
     let visibleSteps = 0;
-    document.querySelectorAll(".step-card").forEach((card) => {
+    document.querySelectorAll(".step-section").forEach((section) => {
       if (!query) {
-        card.classList.remove("is-hidden");
+        section.classList.remove("is-hidden");
         visibleSteps++;
         return;
       }
-      const hay = (
-        (card.getAttribute("data-keywords") || "") +
-        " " +
-        card.textContent
-      ).toLowerCase();
+      const hay = ((section.getAttribute("data-keywords") || "") + " " + section.textContent).toLowerCase();
       const matched = hay.includes(query);
-      card.classList.toggle("is-hidden", !matched);
+      section.classList.toggle("is-hidden", !matched);
       if (matched) visibleSteps++;
     });
 
@@ -442,33 +392,17 @@
     if (statusBar && statusText) {
       statusBar.hidden = !query;
       if (query) {
-        statusText.textContent = `Filter aktif: "${rawQuery.trim()}" — ${visibleSteps} langkah & ${visibleRows} baris cheat sheet cocok.`;
+        statusText.textContent = `Showing ${visibleSteps} procedural sections and ${visibleRows} command reference entries matching "${rawQuery.trim()}".`;
       }
     }
     if (stepsEmpty) stepsEmpty.hidden = visibleSteps > 0;
     if (cheatEmpty) cheatEmpty.hidden = visibleRows > 0;
   }
 
-  function applySidebarCmdFilter(rawQuery) {
-    const query = rawQuery.trim().toLowerCase();
-    let visibleCount = 0;
-    document.querySelectorAll(".cmd-pill").forEach((pill) => {
-      const cmd = (pill.getAttribute("data-cmd") || pill.textContent).toLowerCase();
-      const matched = !query || cmd.includes(query);
-      pill.classList.toggle("is-hidden", !matched);
-      if (matched) visibleCount++;
-    });
-
-    const empty = document.getElementById("cmd-filter-empty");
-    if (empty) {
-      empty.hidden = visibleCount > 0;
-    }
-  }
-
   function setupScrollspy() {
-    const sections = [
+    const sectionIds = [
       "overview",
-      "sandbox",
+      "simulator",
       "step-1",
       "step-2",
       "step-3",
@@ -476,12 +410,11 @@
       "step-5",
       "step-6",
       "step-7",
-      "cheat-sheet",
-    ]
-      .map((id) => document.getElementById(id))
-      .filter(Boolean);
-
+      "step-8",
+    ];
+    const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
     const linksById = new Map();
+
     document.querySelectorAll("[data-scrollspy]").forEach((link) => {
       linksById.set(link.getAttribute("data-scrollspy"), link);
     });
@@ -497,8 +430,7 @@
       let currentId = sections[0] ? sections[0].id : "overview";
       for (const sec of sections) {
         if (sec.classList.contains("is-hidden")) continue;
-        const rect = sec.getBoundingClientRect();
-        if (rect.top <= offset) {
+        if (sec.getBoundingClientRect().top <= offset) {
           currentId = sec.id;
         }
       }
@@ -526,36 +458,20 @@
     updateOnScroll();
   }
 
-  function closeMobileSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    const backdrop = document.getElementById("sidebar-backdrop");
-    if (sidebar) sidebar.classList.remove("is-open");
-    if (backdrop) backdrop.classList.remove("is-open");
-  }
-
-  function openMobileSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    const backdrop = document.getElementById("sidebar-backdrop");
-    if (sidebar) sidebar.classList.add("is-open");
-    if (backdrop) backdrop.classList.add("is-open");
-  }
-
   function init() {
     state.completedSteps = loadCompletedSteps();
     setOS(detectInitialOS(), false);
     updateProgressUI();
 
-    // OS Switcher buttons
     document.querySelectorAll("[data-set-os]").forEach((btn) => {
       btn.addEventListener("click", () => {
         setOS(btn.getAttribute("data-set-os"), true);
       });
     });
 
-    // Step checklist buttons
-    document.querySelectorAll("[data-toggle-step]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        toggleStep(btn.getAttribute("data-toggle-step"));
+    document.querySelectorAll("[data-toggle-step]").forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        setStepCompleted(checkbox.getAttribute("data-toggle-step"), checkbox.checked);
       });
     });
 
@@ -564,8 +480,7 @@
       resetBtn.addEventListener("click", resetProgress);
     }
 
-    // Copy buttons inside code blocks
-    document.querySelectorAll(".btn-copy").forEach((btn) => {
+    document.querySelectorAll(".code-block .copy-btn").forEach((btn) => {
       const original = btn.textContent.trim();
       btn.addEventListener("click", async () => {
         const block = btn.closest(".code-block");
@@ -576,7 +491,6 @@
       });
     });
 
-    // Terminal simulator controls
     document.querySelectorAll(".sim-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         renderSimOutput(btn.getAttribute("data-sim"));
@@ -605,15 +519,14 @@
           span.className = "t-prompt";
           span.textContent =
             state.os === "windows"
-              ? "PS C:\\Dev\\myapp> # Pilih perintah di atas untuk menjalankan simulasi..."
-              : "~/code/myapp $ # Pilih perintah di atas untuk menjalankan simulasi...";
+              ? "PS C:\\Dev\\myapp> # Select a command above to preview its output."
+              : "~/code/myapp $ # Select a command above to preview its output.";
           outEl.replaceChildren(span);
         }
         document.querySelectorAll(".sim-btn").forEach((b) => b.classList.remove("is-active"));
       });
     }
 
-    // Global Search & Ctrl+K / '/' shortcut
     const searchInput = document.getElementById("global-search");
     const searchClear = document.getElementById("search-clear");
     const searchResetStatus = document.getElementById("search-reset-status");
@@ -625,60 +538,29 @@
     };
 
     if (searchInput) {
-      searchInput.addEventListener("input", (e) => {
-        applyGlobalSearch(e.target.value);
-      });
+      searchInput.addEventListener("input", (e) => applyGlobalSearch(e.target.value));
     }
     if (searchClear) searchClear.addEventListener("click", resetGlobalSearch);
     if (searchResetStatus) searchResetStatus.addEventListener("click", resetGlobalSearch);
     if (stepsEmptyReset) stepsEmptyReset.addEventListener("click", resetGlobalSearch);
 
-    // Sidebar subcommand filter
-    const cmdFilter = document.getElementById("cmd-filter");
-    if (cmdFilter) {
-      cmdFilter.addEventListener("input", (e) => {
-        applySidebarCmdFilter(e.target.value);
-      });
-    }
-
-    // Sidebar command quick jump (clear global filter if target step was hidden)
-    document.querySelectorAll(".cmd-pill").forEach((pill) => {
-      pill.addEventListener("click", (e) => {
-        const targetSelector = pill.getAttribute("href");
-        if (!targetSelector) return;
-        const target = document.querySelector(targetSelector);
+    document.querySelectorAll(".toc-link").forEach((link) => {
+      link.addEventListener("click", () => {
+        const selector = link.getAttribute("href");
+        if (!selector) return;
+        const target = document.querySelector(selector);
         if (!target) return;
 
         if (target.classList.contains("is-hidden")) {
           resetGlobalSearch();
         }
-        closeMobileSidebar();
-        target.classList.add("is-highlight");
-        window.setTimeout(() => target.classList.remove("is-highlight"), 1400);
-      });
-    });
-
-    // Mobile drawer controls
-    const sidebarToggle = document.getElementById("sidebar-toggle");
-    const sidebarClose = document.getElementById("sidebar-close");
-    const sidebarBackdrop = document.getElementById("sidebar-backdrop");
-    if (sidebarToggle) sidebarToggle.addEventListener("click", openMobileSidebar);
-    if (sidebarClose) sidebarClose.addEventListener("click", closeMobileSidebar);
-    if (sidebarBackdrop) sidebarBackdrop.addEventListener("click", closeMobileSidebar);
-    document.querySelectorAll(".toc-link").forEach((link) => {
-      link.addEventListener("click", () => {
-        const targetSelector = link.getAttribute("href");
-        if (targetSelector && targetSelector.startsWith("#step-")) {
-          const target = document.querySelector(targetSelector);
-          if (target && target.classList.contains("is-hidden")) {
-            resetGlobalSearch();
-          }
+        if (target.classList.contains("doc-section")) {
+          target.classList.add("is-highlight");
+          window.setTimeout(() => target.classList.remove("is-highlight"), 1200);
         }
-        closeMobileSidebar();
       });
     });
 
-    // Global keyboard shortcuts
     document.addEventListener("keydown", (e) => {
       const tag = (document.activeElement && document.activeElement.tagName) || "";
       const isTyping = tag === "INPUT" || tag === "TEXTAREA";
@@ -700,14 +582,11 @@
         return;
       }
 
-      if (e.key === "Escape") {
-        closeMobileSidebar();
-        if (document.activeElement === searchInput) {
-          if (searchInput.value) {
-            resetGlobalSearch();
-          } else {
-            searchInput.blur();
-          }
+      if (e.key === "Escape" && document.activeElement === searchInput) {
+        if (searchInput.value) {
+          resetGlobalSearch();
+        } else {
+          searchInput.blur();
         }
       }
     });
