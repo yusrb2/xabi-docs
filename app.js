@@ -3,13 +3,16 @@
 
   const STORAGE_OS = "xabi_docs_os";
   const STORAGE_STEPS = "xabi_docs_completed_steps";
+  const STORAGE_THEME = "xabi_docs_theme";
   const TOTAL_STEPS = 7;
 
   const state = {
     os: "windows",
+    theme: "light",
     completedSteps: new Set(),
     activeSimCmd: "xabi doctor",
     searchQuery: "",
+    codeTemplates: [],
   };
 
   // Simulated CLI output aligned with cmd/xabi and internal/commands implementations
@@ -141,6 +144,68 @@
     },
   };
 
+  const KNOWN_COMMANDS = new Set([
+    "xabi",
+    "git",
+    "cd",
+    "go",
+    "make",
+    "sudo",
+    "export",
+    "icacls",
+    "setfacl",
+    "setcap",
+    "mkdir",
+    "New-Item",
+    "Copy-Item",
+    "Add-Content",
+    "Out-String",
+    "Invoke-Expression",
+    "if",
+  ]);
+
+  function getSavedTheme() {
+    try {
+      const saved = localStorage.getItem(STORAGE_THEME);
+      if (saved === "light" || saved === "dark") {
+        return saved;
+      }
+    } catch (_) {
+      // Ignore storage restrictions
+    }
+    return null;
+  }
+
+  function detectInitialTheme() {
+    const preset = document.documentElement.dataset.theme;
+    if (preset === "light" || preset === "dark") {
+      return preset;
+    }
+    const saved = getSavedTheme();
+    if (saved) return saved;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  function setTheme(theme, persist = true) {
+    state.theme = theme === "dark" ? "dark" : "light";
+    document.documentElement.dataset.theme = state.theme;
+
+    const toggle = document.getElementById("theme-toggle");
+    if (toggle) {
+      const isDark = state.theme === "dark";
+      toggle.setAttribute("aria-pressed", String(isDark));
+      toggle.setAttribute("aria-label", isDark ? "Switch to light theme" : "Switch to dark theme");
+    }
+
+    if (persist) {
+      try {
+        localStorage.setItem(STORAGE_THEME, state.theme);
+      } catch (_) {
+        // Ignore storage errors
+      }
+    }
+  }
+
   function detectInitialOS() {
     try {
       const saved = localStorage.getItem(STORAGE_OS);
@@ -177,6 +242,208 @@
     }
   }
 
+  function captureCodeTemplates() {
+    state.codeTemplates = [];
+    document.querySelectorAll(".code-block pre code").forEach((codeEl) => {
+      const segments = [];
+      codeEl.childNodes.forEach((node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          segments.push({ kind: "text", value: node.textContent });
+        } else if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains("os-token")) {
+          segments.push({
+            kind: "os",
+            win: node.getAttribute("data-win") ?? node.textContent,
+            linux: node.getAttribute("data-linux") ?? node.textContent,
+          });
+        } else {
+          segments.push({ kind: "text", value: node.textContent });
+        }
+      });
+      state.codeTemplates.push({ el: codeEl, segments });
+    });
+  }
+
+  function appendHighlightedToken(parent, cls, text) {
+    if (!text) return;
+    if (!cls) {
+      parent.appendChild(document.createTextNode(text));
+      return;
+    }
+    const span = document.createElement("span");
+    span.className = cls;
+    span.textContent = text;
+    parent.appendChild(span);
+  }
+
+  function tokenizeCodeLine(line, frag) {
+    if (!line.length) return;
+
+    const leadingMatch = line.match(/^(\s*)(.*)$/);
+    const indent = leadingMatch ? leadingMatch[1] : "";
+    const rest = leadingMatch ? leadingMatch[2] : line;
+
+    if (indent) {
+      appendHighlightedToken(frag, "", indent);
+    }
+
+    if (!rest) return;
+
+    if (rest.startsWith("#")) {
+      appendHighlightedToken(frag, "hl-comment", rest);
+      return;
+    }
+
+    let i = 0;
+    const len = rest.length;
+    let expectCommand = true;
+    let expectXabiSubcommand = false;
+
+    while (i < len) {
+      const ch = rest[i];
+
+      // Preserve exact whitespace runs
+      if (/\s/.test(ch)) {
+        let j = i + 1;
+        while (j < len && /\s/.test(rest[j])) j++;
+        appendHighlightedToken(frag, "", rest.slice(i, j));
+        i = j;
+        continue;
+      }
+
+      // Inline comment preceded by whitespace
+      if (ch === "#" && i > 0 && /\s/.test(rest[i - 1])) {
+        appendHighlightedToken(frag, "hl-comment", rest.slice(i));
+        break;
+      }
+
+      // Quoted strings (double or single quotes)
+      if (ch === '"' || ch === "'") {
+        const quote = ch;
+        let j = i + 1;
+        while (j < len) {
+          if (rest[j] === "\\" || (quote === '"' && rest[j] === "`")) {
+            j += 2;
+            continue;
+          }
+          if (rest[j] === quote) {
+            j++;
+            break;
+          }
+          j++;
+        }
+        appendHighlightedToken(frag, "hl-string", rest.slice(i, j));
+        expectCommand = false;
+        expectXabiSubcommand = false;
+        i = j;
+        continue;
+      }
+
+      // Shell / PowerShell variables ($VAR, ${VAR}, $env:VAR)
+      if (ch === "$") {
+        let j = i + 1;
+        if (j < len && rest[j] === "{") {
+          while (j < len && rest[j] !== "}") j++;
+          if (j < len) j++;
+        } else {
+          while (j < len && /[A-Za-z0-9_:]/.test(rest[j])) j++;
+        }
+        if (j > i + 1) {
+          appendHighlightedToken(frag, "hl-var", rest.slice(i, j));
+          expectCommand = false;
+          expectXabiSubcommand = false;
+          i = j;
+          continue;
+        }
+      }
+
+      // Shell operators and punctuation delimiters
+      if ("|>;={}()".includes(ch)) {
+        let j = i + 1;
+        if ((ch === "|" && rest[j] === "|") || (ch === ">" && rest[j] === ">")) {
+          j++;
+        }
+        appendHighlightedToken(frag, "hl-op", rest.slice(i, j));
+        if (ch === "|" || ch === ";") {
+          expectCommand = true;
+          expectXabiSubcommand = false;
+        } else {
+          expectCommand = false;
+          expectXabiSubcommand = false;
+        }
+        i = j;
+        continue;
+      }
+
+      // Bare word token up to next whitespace or operator
+      let j = i;
+      while (j < len && !/[\s|>;={}()"']/.test(rest[j])) {
+        j++;
+      }
+      const word = rest.slice(i, j);
+
+      if (word === "=") {
+        appendHighlightedToken(frag, "hl-op", word);
+        expectCommand = false;
+        expectXabiSubcommand = false;
+      } else if (expectCommand) {
+        if (word === "xabi") {
+          appendHighlightedToken(frag, "hl-cmd", word);
+          expectCommand = false;
+          expectXabiSubcommand = true;
+        } else if (KNOWN_COMMANDS.has(word)) {
+          appendHighlightedToken(frag, "hl-cmd", word);
+          expectCommand = word === "sudo";
+          expectXabiSubcommand = false;
+        } else {
+          appendHighlightedToken(frag, "", word);
+          expectCommand = false;
+        }
+      } else if (expectXabiSubcommand && /^[a-z][a-z0-9-]*$/.test(word)) {
+        appendHighlightedToken(frag, "hl-subcmd", word);
+        expectXabiSubcommand = false;
+      } else if (word.startsWith("--") || (word.startsWith("-") && word.length > 1 && /[A-Za-z]/.test(word[1]))) {
+        const eqIdx = word.indexOf("=");
+        if (eqIdx > 0) {
+          appendHighlightedToken(frag, "hl-flag", word.slice(0, eqIdx));
+          appendHighlightedToken(frag, "hl-op", "=");
+          appendHighlightedToken(frag, "", word.slice(eqIdx + 1));
+        } else {
+          appendHighlightedToken(frag, "hl-flag", word);
+        }
+        expectXabiSubcommand = false;
+      } else if (/^\d+(?:\.\d+)?$/.test(word)) {
+        appendHighlightedToken(frag, "hl-num", word);
+        expectXabiSubcommand = false;
+      } else {
+        appendHighlightedToken(frag, "", word);
+        expectXabiSubcommand = false;
+      }
+
+      i = j;
+    }
+  }
+
+  function renderCodeBlocksForOS(os) {
+    state.codeTemplates.forEach(({ el, segments }) => {
+      const rawCode = segments
+        .map((seg) => (seg.kind === "os" ? (os === "windows" ? seg.win : seg.linux) : seg.value))
+        .join("");
+
+      el.dataset.rawCode = rawCode;
+
+      const frag = document.createDocumentFragment();
+      const lines = rawCode.split("\n");
+      lines.forEach((line, idx) => {
+        tokenizeCodeLine(line, frag);
+        if (idx < lines.length - 1) {
+          frag.appendChild(document.createTextNode("\n"));
+        }
+      });
+
+      el.replaceChildren(frag);
+    });
+  }
+
   function setOS(os, persist = true) {
     state.os = os === "linux" ? "linux" : "windows";
     document.body.setAttribute("data-platform", state.os);
@@ -207,20 +474,34 @@
       }
     }
 
+    renderCodeBlocksForOS(state.os);
     renderSimOutput(state.activeSimCmd);
   }
 
   function updateProgressUI() {
     const doneCount = state.completedSteps.size;
+    const pct = `${Math.round((doneCount / TOTAL_STEPS) * 100)}%`;
 
     const progressText = document.getElementById("progress-text");
+    const progressFill = document.getElementById("progress-fill");
     const progressReset = document.getElementById("progress-reset");
+    const tocProgressText = document.getElementById("toc-progress-text");
+    const tocProgressFill = document.getElementById("toc-progress-fill");
 
     if (progressText) {
-      progressText.textContent = `${doneCount}/${TOTAL_STEPS} completed`;
+      progressText.textContent = `${doneCount}/${TOTAL_STEPS}`;
+    }
+    if (progressFill) {
+      progressFill.style.width = pct;
     }
     if (progressReset) {
       progressReset.hidden = doneCount === 0;
+    }
+    if (tocProgressText) {
+      tocProgressText.textContent = `${doneCount} of ${TOTAL_STEPS} completed`;
+    }
+    if (tocProgressFill) {
+      tocProgressFill.style.width = pct;
     }
 
     document.querySelectorAll(".step-section").forEach((section) => {
@@ -311,7 +592,10 @@
     exitSpan.textContent = "\n[exit 0]";
     frag.appendChild(exitSpan);
 
+    outEl.classList.remove("is-updating");
+    void outEl.offsetWidth;
     outEl.replaceChildren(frag);
+    outEl.classList.add("is-updating");
   }
 
   async function copyText(text) {
@@ -341,12 +625,21 @@
   }
 
   function flashCopied(btn, originalText) {
+    const labelEl = btn.querySelector(".copy-label");
+    const setBtnText = (txt) => {
+      if (labelEl) {
+        labelEl.textContent = txt;
+      } else {
+        btn.textContent = txt;
+      }
+    };
+
     btn.classList.add("is-copied");
-    btn.textContent = "Copied";
+    setBtnText("Copied");
     window.clearTimeout(btn._copyTimer);
     btn._copyTimer = window.setTimeout(() => {
       btn.classList.remove("is-copied");
-      btn.textContent = originalText;
+      setBtnText(originalText);
     }, 1500);
   }
 
@@ -399,6 +692,14 @@
     if (cheatEmpty) cheatEmpty.hidden = visibleRows > 0;
   }
 
+  function updateReadingProgress() {
+    const bar = document.getElementById("reading-progress");
+    if (!bar) return;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const ratio = maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
+    bar.style.transform = `scaleX(${ratio.toFixed(4)})`;
+  }
+
   function setupScrollspy() {
     const sectionIds = [
       "overview",
@@ -431,7 +732,9 @@
     };
 
     const updateOnScroll = () => {
-      const offset = 130;
+      updateReadingProgress();
+
+      const offset = 140;
       let currentId = sections[0] ? sections[0].id : "overview";
       for (const sec of sections) {
         if (sec.classList.contains("is-hidden")) continue;
@@ -460,6 +763,7 @@
       },
       { passive: true }
     );
+    window.addEventListener("resize", updateReadingProgress, { passive: true });
     updateOnScroll();
   }
 
@@ -488,9 +792,34 @@
   }
 
   function init() {
+    setTheme(detectInitialTheme(), false);
+    captureCodeTemplates();
+
     state.completedSteps = loadCompletedSteps();
     setOS(detectInitialOS(), false);
     updateProgressUI();
+
+    const searchKbd = document.getElementById("search-kbd");
+    if (searchKbd) {
+      const isMac = /mac|iphone|ipad|ipod/i.test(navigator.platform || navigator.userAgent || "");
+      searchKbd.textContent = isMac ? "⌘K" : "Ctrl K";
+    }
+
+    const themeToggle = document.getElementById("theme-toggle");
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        setTheme(state.theme === "dark" ? "light" : "dark", true);
+      });
+    }
+
+    if (window.matchMedia) {
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+      media.addEventListener("change", (e) => {
+        if (!getSavedTheme()) {
+          setTheme(e.matches ? "dark" : "light", false);
+        }
+      });
+    }
 
     document.querySelectorAll("[data-set-os]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -510,12 +839,14 @@
     }
 
     document.querySelectorAll(".code-block .copy-btn").forEach((btn) => {
-      const original = btn.textContent.trim();
+      const labelEl = btn.querySelector(".copy-label");
+      const original = (labelEl ? labelEl.textContent : btn.textContent).trim();
       btn.addEventListener("click", async () => {
         const block = btn.closest(".code-block");
         const codeEl = block ? block.querySelector("pre code") : null;
         if (!codeEl) return;
-        const ok = await copyText(codeEl.textContent.trimEnd());
+        const raw = codeEl.dataset.rawCode || codeEl.textContent;
+        const ok = await copyText(raw.trimEnd());
         if (ok) flashCopied(btn, original);
       });
     });
@@ -528,7 +859,8 @@
 
     const simCopy = document.getElementById("sandbox-copy");
     if (simCopy) {
-      const original = simCopy.textContent.trim();
+      const labelEl = simCopy.querySelector(".copy-label");
+      const original = (labelEl ? labelEl.textContent : simCopy.textContent).trim();
       simCopy.addEventListener("click", async () => {
         const outEl = document.getElementById("sandbox-output");
         if (!outEl) return;

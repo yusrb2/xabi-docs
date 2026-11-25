@@ -7,41 +7,88 @@
   <meta name="description" content="Technical documentation and command reference for xabi, a user-space local web development orchestrator for Linux and Windows.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Sans:wght@500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("xabi_docs_theme");
+        var theme = saved === "dark" || saved === "light"
+          ? saved
+          : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.dataset.theme = theme;
+      } catch (_) {
+        document.documentElement.dataset.theme = "light";
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body data-platform="windows">
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
   <header class="topbar">
     <div class="topbar-inner">
       <div class="topbar-left">
-        <button id="nav-toggle" class="mobile-nav-btn" type="button" aria-label="Open navigation menu" aria-expanded="false">Menu</button>
-        <a href="#overview" class="wordmark">xabi</a>
+        <button id="nav-toggle" class="mobile-nav-btn" type="button" aria-label="Open navigation menu" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
+          </svg>
+          <span>Menu</span>
+        </button>
+
+        <a href="#overview" class="wordmark">
+          xabi<span class="wordmark-sep" aria-hidden="true">/</span><span class="wordmark-tag">docs</span>
+        </a>
+
         <nav class="topnav-links" aria-label="Primary navigation">
-          <a href="#overview">Documentation</a>
-          <a href="#step-8">Command Reference</a>
-          <a href="https://github.com/yusrb2/xabi" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="#overview">Overview</a>
+          <a href="#simulator">Simulator</a>
+          <a href="#step-8">Reference</a>
+          <a href="https://github.com/yusrb2/xabi" target="_blank" rel="noopener noreferrer" class="topnav-external">
+            <span>GitHub</span>
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3.5 8.5L8.5 3.5M4.5 3.5h4v4"/>
+            </svg>
+          </a>
         </nav>
       </div>
 
       <div class="topbar-right">
         <div class="os-switcher" role="group" aria-label="Target operating system">
           <button class="os-btn is-active" type="button" data-set-os="windows" aria-pressed="true">Windows</button>
-          <span class="os-divider" aria-hidden="true">|</span>
           <button class="os-btn" type="button" data-set-os="linux" aria-pressed="false">Linux</button>
         </div>
 
         <div class="progress-counter" aria-label="Guide completion progress">
-          <span id="progress-text">0/7 completed</span>
+          <span class="progress-track" aria-hidden="true">
+            <span id="progress-fill" class="progress-fill"></span>
+          </span>
+          <span id="progress-text">0/7</span>
           <button id="progress-reset" class="text-link-btn" type="button" hidden>Reset</button>
         </div>
 
         <div class="search-field" role="search">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="7" cy="7" r="4.5"/>
+            <path d="M10.5 10.5L13.5 13.5"/>
+          </svg>
           <input id="global-search" type="search" placeholder="Search documentation..." aria-label="Search documentation">
-          <kbd id="search-kbd" class="search-kbd">Ctrl+K</kbd>
+          <kbd id="search-kbd" class="search-kbd">Ctrl K</kbd>
           <button id="search-clear" class="search-clear" type="button" aria-label="Clear search" hidden>Clear</button>
         </div>
+
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="false" title="Toggle color theme">
+          <svg class="icon-sun" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" aria-hidden="true">
+            <circle cx="8" cy="8" r="3"/>
+            <path d="M8 1.75v1.3M8 12.95v1.3M1.75 8h1.3M12.95 8h1.3M3.58 3.58l.92.92M11.5 11.5l.92.92M12.42 3.58l-.92.92M4.5 11.5l-.92.92"/>
+          </svg>
+          <svg class="icon-moon" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M13.2 9.9A5.5 5.5 0 0 1 6.1 2.8a5.5 5.5 0 1 0 7.1 7.1Z"/>
+          </svg>
+        </button>
       </div>
     </div>
+    <div id="reading-progress" class="reading-progress" aria-hidden="true"></div>
   </header>
 
   <div id="nav-backdrop" class="nav-backdrop" hidden></div>
@@ -58,10 +105,14 @@
           <p class="sidebar-group-title">Getting Started</p>
           <ul class="sidebar-list">
             <li>
-              <a class="sidebar-link is-active" href="#overview" data-scrollspy="overview">Overview</a>
+              <a class="sidebar-link is-active" href="#overview" data-scrollspy="overview">
+                <span class="nav-step-title">Overview</span>
+              </a>
             </li>
             <li>
-              <a class="sidebar-link" href="#simulator" data-scrollspy="simulator">Terminal Simulator</a>
+              <a class="sidebar-link" href="#simulator" data-scrollspy="simulator">
+                <span class="nav-step-title">Terminal Simulator</span>
+              </a>
             </li>
           </ul>
         </div>
@@ -71,44 +122,93 @@
           <ul class="sidebar-list">
             <li>
               <a class="sidebar-link" href="#step-1" data-scrollspy="step-1" data-step-nav="1">
-                <span>1. Binary Installation</span>
-                <span class="nav-done" aria-hidden="true">Done</span>
+                <span class="nav-step-main">
+                  <span class="nav-step-num">01</span>
+                  <span class="nav-step-title">Binary Installation</span>
+                </span>
+                <span class="nav-done" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+                  </svg>
+                </span>
               </a>
             </li>
             <li>
               <a class="sidebar-link" href="#step-2" data-scrollspy="step-2" data-step-nav="2">
-                <span>2. Diagnostics and Initialization</span>
-                <span class="nav-done" aria-hidden="true">Done</span>
+                <span class="nav-step-main">
+                  <span class="nav-step-num">02</span>
+                  <span class="nav-step-title">Diagnostics and Initialization</span>
+                </span>
+                <span class="nav-done" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+                  </svg>
+                </span>
               </a>
             </li>
             <li>
               <a class="sidebar-link" href="#step-3" data-scrollspy="step-3" data-step-nav="3">
-                <span>3. Service Orchestration</span>
-                <span class="nav-done" aria-hidden="true">Done</span>
+                <span class="nav-step-main">
+                  <span class="nav-step-num">03</span>
+                  <span class="nav-step-title">Service Orchestration</span>
+                </span>
+                <span class="nav-done" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+                  </svg>
+                </span>
               </a>
             </li>
             <li>
               <a class="sidebar-link" href="#step-4" data-scrollspy="step-4" data-step-nav="4">
-                <span>4. Virtual Hosts and Reverse Proxy</span>
-                <span class="nav-done" aria-hidden="true">Done</span>
+                <span class="nav-step-main">
+                  <span class="nav-step-num">04</span>
+                  <span class="nav-step-title">Virtual Hosts and Reverse Proxy</span>
+                </span>
+                <span class="nav-done" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+                  </svg>
+                </span>
               </a>
             </li>
             <li>
               <a class="sidebar-link" href="#step-5" data-scrollspy="step-5" data-step-nav="5">
-                <span>5. Local HTTPS Certificates</span>
-                <span class="nav-done" aria-hidden="true">Done</span>
+                <span class="nav-step-main">
+                  <span class="nav-step-num">05</span>
+                  <span class="nav-step-title">Local HTTPS Certificates</span>
+                </span>
+                <span class="nav-done" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+                  </svg>
+                </span>
               </a>
             </li>
             <li>
               <a class="sidebar-link" href="#step-6" data-scrollspy="step-6" data-step-nav="6">
-                <span>6. PHP Version Management</span>
-                <span class="nav-done" aria-hidden="true">Done</span>
+                <span class="nav-step-main">
+                  <span class="nav-step-num">06</span>
+                  <span class="nav-step-title">PHP Version Management</span>
+                </span>
+                <span class="nav-done" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+                  </svg>
+                </span>
               </a>
             </li>
             <li>
               <a class="sidebar-link" href="#step-7" data-scrollspy="step-7" data-step-nav="7">
-                <span>7. Operational Utilities</span>
-                <span class="nav-done" aria-hidden="true">Done</span>
+                <span class="nav-step-main">
+                  <span class="nav-step-num">07</span>
+                  <span class="nav-step-title">Operational Utilities</span>
+                </span>
+                <span class="nav-done" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+                  </svg>
+                </span>
               </a>
             </li>
           </ul>
@@ -118,60 +218,88 @@
           <p class="sidebar-group-title">Reference</p>
           <ul class="sidebar-list">
             <li>
-              <a class="sidebar-link" href="#step-8" data-scrollspy="step-8">8. Command Reference</a>
+              <a class="sidebar-link" href="#step-8" data-scrollspy="step-8">
+                <span class="nav-step-main">
+                  <span class="nav-step-num">08</span>
+                  <span class="nav-step-title">Command Reference</span>
+                </span>
+              </a>
             </li>
           </ul>
         </div>
       </nav>
     </aside>
 
-    <main class="main-column">
-      <div class="breadcrumb" aria-label="Breadcrumb">Docs / Procedural Guide</div>
-
+    <main id="main-content" class="main-column">
       <section id="overview" class="doc-intro">
+        <div class="masthead-eyebrow">
+          <span class="breadcrumb" aria-label="Breadcrumb">Docs / Procedural Guide</span>
+          <span class="masthead-meta">Go stdlib &middot; XDG user-space</span>
+        </div>
+
         <h1>xabi Local Development Orchestrator</h1>
-        <p>
+        <p class="doc-lead">
           <code>xabi</code> is a user-space local web development orchestrator compiled from the Go standard library. It manages native system binaries (<code>nginx</code>, <code>php-fpm</code> or <code>php-cgi.exe</code>, <code>mariadbd</code>, <code>mkcert</code>, and <code>cloudflared</code>) directly under the active user account without root system daemons, Windows service wrappers, or containers.
         </p>
         <p>
           Configuration, database storage, and runtime sockets follow the XDG Base Directory specification. Select <strong>Windows</strong> or <strong>Linux</strong> in the navigation bar to switch commands, file paths, upstream sockets, and completion instructions across this page.
         </p>
 
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>XDG Category</th>
-              <th>Resolved Path (<span class="os-token" data-win="Windows" data-linux="Linux">Windows</span>)</th>
-              <th>Contents</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Config (<code>$XDG_CONFIG_HOME</code>)</td>
-              <td><code class="os-token" data-win="%USERPROFILE%\.config\xabi\" data-linux="~/.config/xabi/">%USERPROFILE%\.config\xabi\</code></td>
-              <td><code>config.toml</code>, <code>sites.toml</code>, <code>nginx/</code>, <code>certs/</code>, <code>php/</code></td>
-            </tr>
-            <tr>
-              <td>Data (<code>$XDG_DATA_HOME</code>)</td>
-              <td><code class="os-token" data-win="%USERPROFILE%\.local\share\xabi\" data-linux="~/.local/share/xabi/">%USERPROFILE%\.local\share\xabi\</code></td>
-              <td><code>db/</code> (MariaDB datadir), <code>bin/</code> (PHP shims/symlinks), <code>php/</code></td>
-            </tr>
-            <tr>
-              <td>Runtime (<code>$XDG_RUNTIME_DIR</code>)</td>
-              <td><code class="os-token" data-win="%TEMP%\xabi\" data-linux="$XDG_RUNTIME_DIR/xabi/">%TEMP%\xabi\</code></td>
-              <td><code>.pid</code> files, <span class="os-token" data-win="log files, and Nginx temp buffers" data-linux="Unix domain sockets (.sock), log files, and Nginx temp buffers">log files, and Nginx temp buffers</span></td>
-            </tr>
-            <tr>
-              <td>Hosts File &amp; Default PHP Upstream</td>
-              <td><code class="os-token" data-win="C:\Windows\System32\drivers\etc\hosts &bull; 127.0.0.1:9000" data-linux="/etc/hosts &bull; unix:$XDG_RUNTIME_DIR/xabi/php.sock">C:\Windows\System32\drivers\etc\hosts &bull; 127.0.0.1:9000</code></td>
-              <td>Managed entries enclosed by <code># BEGIN xabi</code> and <code># END xabi</code></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="meta-strip" aria-label="Architecture summary">
+          <div class="meta-cell">
+            <span class="meta-label">Runtime Model</span>
+            <span class="meta-value">User-space native binaries</span>
+          </div>
+          <div class="meta-cell">
+            <span class="meta-label">Core Stack</span>
+            <span class="meta-value">Nginx &middot; PHP &middot; MariaDB &middot; mkcert</span>
+          </div>
+          <div class="meta-cell">
+            <span class="meta-label">Active Platform</span>
+            <span class="meta-value os-token" data-win="Windows (PowerShell)" data-linux="Linux (POSIX / XDG)">Windows (PowerShell)</span>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>XDG Category</th>
+                <th>Resolved Path (<span class="os-token" data-win="Windows" data-linux="Linux">Windows</span>)</th>
+                <th>Contents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Config (<code>$XDG_CONFIG_HOME</code>)</td>
+                <td><code class="os-token" data-win="%USERPROFILE%\.config\xabi\" data-linux="~/.config/xabi/">%USERPROFILE%\.config\xabi\</code></td>
+                <td><code>config.toml</code>, <code>sites.toml</code>, <code>nginx/</code>, <code>certs/</code>, <code>php/</code></td>
+              </tr>
+              <tr>
+                <td>Data (<code>$XDG_DATA_HOME</code>)</td>
+                <td><code class="os-token" data-win="%USERPROFILE%\.local\share\xabi\" data-linux="~/.local/share/xabi/">%USERPROFILE%\.local\share\xabi\</code></td>
+                <td><code>db/</code> (MariaDB datadir), <code>bin/</code> (PHP shims/symlinks), <code>php/</code></td>
+              </tr>
+              <tr>
+                <td>Runtime (<code>$XDG_RUNTIME_DIR</code>)</td>
+                <td><code class="os-token" data-win="%TEMP%\xabi\" data-linux="$XDG_RUNTIME_DIR/xabi/">%TEMP%\xabi\</code></td>
+                <td><code>.pid</code> files, <span class="os-token" data-win="log files, and Nginx temp buffers" data-linux="Unix domain sockets (.sock), log files, and Nginx temp buffers">log files, and Nginx temp buffers</span></td>
+              </tr>
+              <tr>
+                <td>Hosts File &amp; Default PHP Upstream</td>
+                <td><code class="os-token" data-win="C:\Windows\System32\drivers\etc\hosts &bull; 127.0.0.1:9000" data-linux="/etc/hosts &bull; unix:$XDG_RUNTIME_DIR/xabi/php.sock">C:\Windows\System32\drivers\etc\hosts &bull; 127.0.0.1:9000</code></td>
+                <td>Managed entries enclosed by <code># BEGIN xabi</code> and <code># END xabi</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section id="simulator" class="doc-section">
-        <h2>Terminal Simulator</h2>
+        <div class="section-eyebrow">
+          <span>Interactive Preview</span>
+        </div>
+        <h2>Terminal Simulator <a class="heading-anchor" href="#simulator" aria-label="Link to Terminal Simulator">#</a></h2>
         <p>Select a command to preview representative execution output for the <strong id="sandbox-os-label">Windows</strong> local environment.</p>
 
         <div class="sim-controls" role="group" aria-label="Simulator commands">
@@ -186,9 +314,21 @@
 
         <div class="terminal-box">
           <div class="terminal-header">
-            <span id="sandbox-active-cmd" class="terminal-caption">xabi doctor</span>
+            <div class="terminal-title-group">
+              <span class="terminal-dot" aria-hidden="true"></span>
+              <span id="sandbox-active-cmd" class="terminal-caption">xabi doctor</span>
+            </div>
             <div class="terminal-actions">
-              <button id="sandbox-copy" class="copy-btn" type="button">Copy</button>
+              <button id="sandbox-copy" class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
               <button id="sandbox-clear" class="copy-btn" type="button">Clear</button>
             </div>
           </div>
@@ -207,8 +347,12 @@
       </div>
 
       <!-- STEP 1 -->
-      <section id="step-1" class="doc-section step-section" data-step="1" data-keywords="binary installation go build make install path xabi.exe ~/.local/bin %userprofile% version">
-        <h2>1. Binary Installation</h2>
+      <section id="step-1" class="doc-section step-section" data-step="1" data-keywords="1 binary installation go build make install path xabi.exe ~/.local/bin %userprofile% version">
+        <div class="section-eyebrow">
+          <span>Step 01</span>
+          <span class="step-done-badge" aria-hidden="true">Completed</span>
+        </div>
+        <h2>Binary Installation <a class="heading-anchor" href="#step-1" aria-label="Link to Binary Installation">#</a></h2>
         <p>Compile <code>./cmd/xabi</code> from source, place the executable in the user binary directory, and configure <code>PATH</code>.</p>
 
         <div class="os-block" data-os="windows">
@@ -217,7 +361,16 @@
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">PowerShell</span>
-              <button class="copy-btn" type="button">Copy</button>
+              <button class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
             </div>
             <pre><code>git clone https://github.com/yusrb2/xabi.git
 cd xabi
@@ -233,7 +386,16 @@ Copy-Item .\bin\xabi.exe "$binDir\xabi.exe" -Force</code></pre>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">PowerShell</span>
-              <button class="copy-btn" type="button">Copy</button>
+              <button class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
             </div>
             <pre><code>$binDir = "$env:USERPROFILE\.local\share\xabi\bin"
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
@@ -251,7 +413,16 @@ xabi version</code></pre>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">Bash / Zsh</span>
-              <button class="copy-btn" type="button">Copy</button>
+              <button class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
             </div>
             <pre><code>git clone https://github.com/yusrb2/xabi.git
 cd xabi
@@ -264,7 +435,16 @@ make install
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">Bash / Zsh</span>
-              <button class="copy-btn" type="button">Copy</button>
+              <button class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
             </div>
             <pre><code>export PATH="$HOME/.local/bin:$HOME/.local/share/xabi/bin:$PATH"
 
@@ -275,14 +455,23 @@ xabi version</code></pre>
         <div class="step-footer">
           <label class="step-check">
             <input type="checkbox" data-toggle-step="1">
+            <span class="check-box" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+              </svg>
+            </span>
             <span class="check-label">Mark step as completed</span>
           </label>
         </div>
       </section>
 
       <!-- STEP 2 -->
-      <section id="step-2" class="doc-section step-section" data-step="2" data-keywords="diagnostics initialization doctor init dry-run force nginx php-cgi php-fpm mariadb hosts setfacl icacls setcap cap_net_bind_service 80 443 3306">
-        <h2>2. Diagnostics and Initialization</h2>
+      <section id="step-2" class="doc-section step-section" data-step="2" data-keywords="2 diagnostics initialization doctor init dry-run force nginx php-cgi php-fpm mariadb hosts setfacl icacls setcap cap_net_bind_service 80 443 3306">
+        <div class="section-eyebrow">
+          <span>Step 02</span>
+          <span class="step-done-badge" aria-hidden="true">Completed</span>
+        </div>
+        <h2>Diagnostics and Initialization <a class="heading-anchor" href="#step-2" aria-label="Link to Diagnostics and Initialization">#</a></h2>
         <p>Link system binaries, provision the XDG directory layout, grant write access on the system <code>hosts</code> file, and verify port availability.</p>
 
         <p><code>xabi</code> locates <code>nginx</code> (required) and optional binaries (<code>php-fpm</code> or <code>php-cgi</code>, <code>mariadbd</code> or <code>mysqld</code>, <code>mkcert</code>, and <code>cloudflared</code>) inside <code class="os-token" data-win="%USERPROFILE%\.local\share\xabi\bin" data-linux="~/.local/share/xabi/bin">%USERPROFILE%\.local\share\xabi\bin</code>, the <code>PATH</code> environment variable<span class="os-token" data-win="" data-linux=", and system paths /usr/sbin, /sbin, and /usr/local/sbin"></span>.</p>
@@ -293,7 +482,16 @@ xabi version</code></pre>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">PowerShell</span>
-              <button class="copy-btn" type="button">Copy</button>
+              <button class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
             </div>
             <pre><code># Preview planned directories, templates, and setup steps without modifying disk state
 xabi init --dry-run
@@ -310,7 +508,16 @@ xabi doctor</code></pre>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">PowerShell (Administrator)</span>
-              <button class="copy-btn" type="button">Copy</button>
+              <button class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
             </div>
             <pre><code>icacls "$env:SystemRoot\System32\drivers\etc\hosts" /grant "${env:USERNAME}:(M)"</code></pre>
           </div>
@@ -326,7 +533,16 @@ xabi doctor</code></pre>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">Bash</span>
-              <button class="copy-btn" type="button">Copy</button>
+              <button class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
             </div>
             <pre><code># Grant write ACL on /etc/hosts to the current user
 sudo setfacl -m u:$USER:rw /etc/hosts
@@ -351,14 +567,23 @@ xabi doctor</code></pre>
         <div class="step-footer">
           <label class="step-check">
             <input type="checkbox" data-toggle-step="2">
+            <span class="check-box" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+              </svg>
+            </span>
             <span class="check-label">Mark step as completed</span>
           </label>
         </div>
       </section>
 
       <!-- STEP 3 -->
-      <section id="step-3" class="doc-section step-section" data-step="3" data-keywords="service orchestration up status st restart reload down pid rss sighup sigusr2 nginx php-fpm php-cgi mariadb daemon">
-        <h2>3. Service Orchestration</h2>
+      <section id="step-3" class="doc-section step-section" data-step="3" data-keywords="3 service orchestration up status st restart reload down pid rss sighup sigusr2 nginx php-fpm php-cgi mariadb daemon">
+        <div class="section-eyebrow">
+          <span>Step 03</span>
+          <span class="step-done-badge" aria-hidden="true">Completed</span>
+        </div>
+        <h2>Service Orchestration <a class="heading-anchor" href="#step-3" aria-label="Link to Service Orchestration">#</a></h2>
         <p>Start, reload, stop, and inspect the live state of <code>nginx</code>, <code>php-fpm</code> (<code>php-cgi.exe</code> on Windows), and <code>mariadb</code> in user-space.</p>
 
         <p>Lifecycle commands are idempotent and accept an optional list of service names. In addition to canonical names (<code>nginx</code>, <code>php-fpm</code>, <code>mariadb</code>), aliases <code>php</code>, <code>php-cgi</code>, <code>mysql</code>, and <code>mysqld</code> are supported.</p>
@@ -366,7 +591,16 @@ xabi doctor</code></pre>
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
-            <button class="copy-btn" type="button">Copy</button>
+            <button class="copy-btn" type="button">
+              <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+              </svg>
+              <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8.5L6.5 12L13 4.5"/>
+              </svg>
+              <span class="copy-label">Copy</span>
+            </button>
           </div>
           <pre><code># Start all configured services or specific services only
 xabi up
@@ -399,14 +633,23 @@ xabi down</code></pre>
         <div class="step-footer">
           <label class="step-check">
             <input type="checkbox" data-toggle-step="3">
+            <span class="check-box" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+              </svg>
+            </span>
             <span class="check-label">Mark step as completed</span>
           </label>
         </div>
       </section>
 
       <!-- STEP 4 -->
-      <section id="step-4" class="doc-section step-section" data-step="4" data-keywords="virtual host reverse proxy add ls open rm laravel public static html websocket dir php sites.toml">
-        <h2>4. Virtual Hosts and Reverse Proxy</h2>
+      <section id="step-4" class="doc-section step-section" data-step="4" data-keywords="4 virtual host reverse proxy add ls open rm laravel public static html websocket dir php sites.toml">
+        <div class="section-eyebrow">
+          <span>Step 04</span>
+          <span class="step-done-badge" aria-hidden="true">Completed</span>
+        </div>
+        <h2>Virtual Hosts and Reverse Proxy <a class="heading-anchor" href="#step-4" aria-label="Link to Virtual Hosts and Reverse Proxy">#</a></h2>
         <p>Register local <code>*.test</code> domains, configure reverse proxies with WebSocket upgrade headers, and manage site entries.</p>
 
         <ul class="prose-list">
@@ -418,7 +661,16 @@ xabi down</code></pre>
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
-            <button class="copy-btn" type="button">Copy</button>
+            <button class="copy-btn" type="button">
+              <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+              </svg>
+              <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8.5L6.5 12L13 4.5"/>
+              </svg>
+              <span class="copy-label">Copy</span>
+            </button>
           </div>
           <pre><code># Register the current directory (domain defaults to sanitized directory name -&gt; laravel-app.test)
 cd <span class="os-token" data-win="C:\Dev\laravel-app" data-linux="~/code/laravel-app">C:\Dev\laravel-app</span>
@@ -440,14 +692,23 @@ xabi rm myapp</code></pre>
         <div class="step-footer">
           <label class="step-check">
             <input type="checkbox" data-toggle-step="4">
+            <span class="check-box" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+              </svg>
+            </span>
             <span class="check-label">Mark step as completed</span>
           </label>
         </div>
       </section>
 
       <!-- STEP 5 -->
-      <section id="step-5" class="doc-section step-section" data-step="5" data-keywords="https tls ssl mkcert redirect 301 off disable">
-        <h2>5. Local HTTPS Certificates</h2>
+      <section id="step-5" class="doc-section step-section" data-step="5" data-keywords="5 https tls ssl mkcert redirect 301 off disable">
+        <div class="section-eyebrow">
+          <span>Step 05</span>
+          <span class="step-done-badge" aria-hidden="true">Completed</span>
+        </div>
+        <h2>Local HTTPS Certificates <a class="heading-anchor" href="#step-5" aria-label="Link to Local HTTPS Certificates">#</a></h2>
         <p>Issue locally trusted TLS certificates via <code>mkcert</code> and enable automatic HTTP-to-HTTPS <code>301</code> redirects for registered domains.</p>
 
         <p>Executing <code>xabi tls</code> generates <code>&lt;domain&gt;.pem</code> and <code>&lt;domain&gt;-key.pem</code> (covering <code>&lt;domain&gt;</code> and wildcard <code>*.&lt;domain&gt;</code>) inside <code class="os-token" data-win="%USERPROFILE%\.config\xabi\certs\" data-linux="~/.config/xabi/certs/">%USERPROFILE%\.config\xabi\certs\</code>. The Nginx virtual host file is updated with <code>return 301 https://$host$request_uri;</code> on HTTP and <code>listen 443 ssl;</code> on HTTPS, followed by an Nginx reload.</p>
@@ -455,7 +716,16 @@ xabi rm myapp</code></pre>
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
-            <button class="copy-btn" type="button">Copy</button>
+            <button class="copy-btn" type="button">
+              <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+              </svg>
+              <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8.5L6.5 12L13 4.5"/>
+              </svg>
+              <span class="copy-label">Copy</span>
+            </button>
           </div>
           <pre><code># Enable TLS for the site matching the current working directory or a named site
 xabi tls
@@ -473,20 +743,38 @@ xabi tls myapp --off
         <div class="step-footer">
           <label class="step-check">
             <input type="checkbox" data-toggle-step="5">
+            <span class="check-box" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+              </svg>
+            </span>
             <span class="check-label">Mark step as completed</span>
           </label>
         </div>
       </section>
 
       <!-- STEP 6 -->
-      <section id="step-6" class="doc-section step-section" data-step="6" data-keywords="php version management .php-version use pin 9000 9083 php.sock fastcgi upstream shim symlink">
-        <h2>6. PHP Version Management</h2>
+      <section id="step-6" class="doc-section step-section" data-step="6" data-keywords="6 php version management .php-version use pin 9000 9083 php.sock fastcgi upstream shim symlink">
+        <div class="section-eyebrow">
+          <span>Step 06</span>
+          <span class="step-done-badge" aria-hidden="true">Completed</span>
+        </div>
+        <h2>PHP Version Management <a class="heading-anchor" href="#step-6" aria-label="Link to PHP Version Management">#</a></h2>
         <p>Inspect installed PHP runtimes, switch the global PHP version, or pin an isolated PHP version per project using <code>.php-version</code>.</p>
 
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
-            <button class="copy-btn" type="button">Copy</button>
+            <button class="copy-btn" type="button">
+              <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+              </svg>
+              <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8.5L6.5 12L13 4.5"/>
+              </svg>
+              <span class="copy-label">Copy</span>
+            </button>
           </div>
           <pre><code># List detected PHP installations (* indicates active global) and project .php-version
 xabi php
@@ -502,45 +790,49 @@ xabi php pin 8.3</code></pre>
 
         <h3>Platform upstream isolation</h3>
         <div class="os-block" data-os="windows">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Mechanism</th>
-                <th>Windows Implementation</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Upstream isolation</td>
-                <td>Global default listens on <code>127.0.0.1:9000</code>. Pinned versions map deterministically to <code>127.0.0.1:90xx</code> using <code>9000 + major*10 + minor</code> (for example, PHP <code>8.1</code> &rarr; <code>9081</code>, <code>8.2</code> &rarr; <code>9082</code>, <code>8.3</code> &rarr; <code>9083</code>, <code>8.4</code> &rarr; <code>9084</code>).</td>
-              </tr>
-              <tr>
-                <td>Discovery and shims</td>
-                <td>Scans <code>%USERPROFILE%\.local\share\xabi\php\&lt;ver&gt;</code>, <code>C:\php*</code>, <code>C:\tools\php*</code>, <code>C:\laragon\bin\php\php-*</code>, Chocolatey, Scoop, and <code>PATH</code>. Switching the global version writes <code>php.cmd</code> and <code>php-cgi.cmd</code> shims in <code>BinDir</code>.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mechanism</th>
+                  <th>Windows Implementation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Upstream isolation</td>
+                  <td>Global default listens on <code>127.0.0.1:9000</code>. Pinned versions map deterministically to <code>127.0.0.1:90xx</code> using <code>9000 + major*10 + minor</code> (for example, PHP <code>8.1</code> &rarr; <code>9081</code>, <code>8.2</code> &rarr; <code>9082</code>, <code>8.3</code> &rarr; <code>9083</code>, <code>8.4</code> &rarr; <code>9084</code>).</td>
+                </tr>
+                <tr>
+                  <td>Discovery and shims</td>
+                  <td>Scans <code>%USERPROFILE%\.local\share\xabi\php\&lt;ver&gt;</code>, <code>C:\php*</code>, <code>C:\tools\php*</code>, <code>C:\laragon\bin\php\php-*</code>, Chocolatey, Scoop, and <code>PATH</code>. Switching the global version writes <code>php.cmd</code> and <code>php-cgi.cmd</code> shims in <code>BinDir</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="os-block" data-os="linux">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Mechanism</th>
-                <th>Linux Implementation</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Upstream isolation</td>
-                <td>Global default listens on <code>unix:$XDG_RUNTIME_DIR/xabi/php.sock</code>. Pinned versions spawn dedicated pools configured in <code>~/.config/xabi/php/php-&lt;ver&gt;.conf</code> listening on <code>unix:$XDG_RUNTIME_DIR/xabi/php-&lt;ver&gt;.sock</code> (for example, <code>php-8.3.sock</code>).</td>
-              </tr>
-              <tr>
-                <td>Discovery and symlinks</td>
-                <td>Scans <code>~/.local/share/xabi/php/&lt;ver&gt;</code>, <code>PATH</code>, <code>/usr/bin</code>, <code>/usr/local/bin</code>, and <code>/usr/sbin</code>. Switching the global version atomically updates the <code>php</code> and <code>php-fpm</code> symlinks in <code>~/.local/share/xabi/bin/</code>.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mechanism</th>
+                  <th>Linux Implementation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Upstream isolation</td>
+                  <td>Global default listens on <code>unix:$XDG_RUNTIME_DIR/xabi/php.sock</code>. Pinned versions spawn dedicated pools configured in <code>~/.config/xabi/php/php-&lt;ver&gt;.conf</code> listening on <code>unix:$XDG_RUNTIME_DIR/xabi/php-&lt;ver&gt;.sock</code> (for example, <code>php-8.3.sock</code>).</td>
+                </tr>
+                <tr>
+                  <td>Discovery and symlinks</td>
+                  <td>Scans <code>~/.local/share/xabi/php/&lt;ver&gt;</code>, <code>PATH</code>, <code>/usr/bin</code>, <code>/usr/local/bin</code>, and <code>/usr/sbin</code>. Switching the global version atomically updates the <code>php</code> and <code>php-fpm</code> symlinks in <code>~/.local/share/xabi/bin/</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <p>When <code>xabi add</code> is invoked without <code>--php</code>, it walks the project directory and its nearest parent directories to resolve any existing <code>.php-version</code> file.</p>
@@ -548,21 +840,39 @@ xabi php pin 8.3</code></pre>
         <div class="step-footer">
           <label class="step-check">
             <input type="checkbox" data-toggle-step="6">
+            <span class="check-box" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+              </svg>
+            </span>
             <span class="check-label">Mark step as completed</span>
           </label>
         </div>
       </section>
 
       <!-- STEP 7 -->
-      <section id="step-7" class="doc-section step-section" data-step="7" data-keywords="operational utilities conf log share db completion bash zsh fish powershell editor cloudflared ngrok mariadb mysql">
-        <h2>7. Operational Utilities</h2>
+      <section id="step-7" class="doc-section step-section" data-step="7" data-keywords="7 operational utilities conf log share db completion bash zsh fish powershell editor cloudflared ngrok mariadb mysql">
+        <div class="section-eyebrow">
+          <span>Step 07</span>
+          <span class="step-done-badge" aria-hidden="true">Completed</span>
+        </div>
+        <h2>Operational Utilities <a class="heading-anchor" href="#step-7" aria-label="Link to Operational Utilities">#</a></h2>
         <p>Open raw configuration files, stream service logs, expose local sites over public tunnels, manage MariaDB databases, and generate shell completion scripts.</p>
 
         <h3>Configuration, logs, tunnels, and database</h3>
         <div class="code-block">
           <div class="code-header">
             <span class="code-lang os-token" data-win="PowerShell" data-linux="Bash">PowerShell</span>
-            <button class="copy-btn" type="button">Copy</button>
+            <button class="copy-btn" type="button">
+              <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+              </svg>
+              <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8.5L6.5 12L13 4.5"/>
+              </svg>
+              <span class="copy-label">Copy</span>
+            </button>
           </div>
           <pre><code># Open config.toml, nginx.conf, PHP config, sites.toml, or a site vhost in $EDITOR
 xabi conf
@@ -591,7 +901,16 @@ xabi db drop myapp_db --force</code></pre>
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">PowerShell</span>
-              <button class="copy-btn" type="button">Copy</button>
+              <button class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
             </div>
             <pre><code># Evaluate in the active PowerShell session
 xabi completion powershell | Out-String | Invoke-Expression
@@ -606,7 +925,16 @@ Add-Content -Path $PROFILE -Value "`nxabi completion powershell | Out-String | I
           <div class="code-block">
             <div class="code-header">
               <span class="code-lang">Bash / Zsh / Fish</span>
-              <button class="copy-btn" type="button">Copy</button>
+              <button class="copy-btn" type="button">
+                <svg class="icon-copy" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/>
+                  <path d="M10.5 5.5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/>
+                </svg>
+                <svg class="icon-check" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 8.5L6.5 12L13 4.5"/>
+                </svg>
+                <span class="copy-label">Copy</span>
+              </button>
             </div>
             <pre><code># Bash
 mkdir -p ~/.local/share/bash-completion/completions
@@ -625,6 +953,11 @@ xabi completion fish &gt; ~/.config/fish/completions/xabi.fish</code></pre>
         <div class="step-footer">
           <label class="step-check">
             <input type="checkbox" data-toggle-step="7">
+            <span class="check-box" aria-hidden="true">
+              <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2.5 7.5L5.5 10.5L11.5 3.5"/>
+              </svg>
+            </span>
             <span class="check-label">Mark step as completed</span>
           </label>
         </div>
@@ -632,115 +965,120 @@ xabi completion fish &gt; ~/.config/fish/completions/xabi.fish</code></pre>
 
       <!-- STEP 8 -->
       <section id="step-8" class="doc-section">
-        <h2>8. Command Reference</h2>
+        <div class="section-eyebrow">
+          <span>Reference &middot; 19 Commands</span>
+        </div>
+        <h2>Command Reference <a class="heading-anchor" href="#step-8" aria-label="Link to Command Reference">#</a></h2>
         <p>Complete reference for all 19 commands registered in <code>cmd/xabi</code> and <code>internal/commands</code>.</p>
 
-        <table id="cheat-table" class="data-table">
-          <thead>
-            <tr>
-              <th>Command</th>
-              <th>Syntax and Flags</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="cmd-col">init</td>
-              <td class="syntax-col">xabi init [--dry-run] [--force]</td>
-              <td>Create XDG directories, <code>config.toml</code>, <code>nginx.conf</code>, MariaDB datadir, Linux <code>setcap</code>, and run <code>mkcert -install</code>.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">doctor</td>
-              <td class="syntax-col">xabi doctor</td>
-              <td>Verify XDG layout, required/optional binaries, ports <code>80</code>/<code>443</code>/<code>3306</code>, hosts file permissions, and <code>cap_net_bind_service</code>.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">up</td>
-              <td class="syntax-col">xabi up [service...]</td>
-              <td>Start <code>nginx</code>, <code>php-fpm</code> / <code>php-cgi</code>, and <code>mariadb</code> idempotently.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">down</td>
-              <td class="syntax-col">xabi down [service...]</td>
-              <td>Stop services in reverse order and remove runtime <code>.pid</code> and <code>.sock</code> files.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">restart</td>
-              <td class="syntax-col">xabi restart [--reload] [service...]</td>
-              <td>Restart services, or perform a graceful reload (<code>SIGHUP</code>/<code>SIGUSR2</code> on Linux, <code>nginx -s reload</code> on Windows).</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">status (st)</td>
-              <td class="syntax-col">xabi status [service...]</td>
-              <td>Display <code>RUNNING</code>/<code>STOPPED</code> state, PID, endpoint, and RSS memory with orphan PID recovery.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">add</td>
-              <td class="syntax-col">xabi add [name] [--proxy &lt;port|host:port&gt;] [--dir &lt;path&gt;] [--php &lt;ver&gt;]</td>
-              <td>Auto-detect Laravel/PHP/static roots or reverse proxy WebSocket upstreams, generate Nginx vhost, and update the hosts file.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">rm</td>
-              <td class="syntax-col">xabi rm &lt;name&gt;</td>
-              <td>Remove site <code>.conf</code>, TLS certificates, <code>sites.toml</code> entry, and hosts file entry.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">ls</td>
-              <td class="syntax-col">xabi ls</td>
-              <td>Print registered sites (<code>DOMAIN</code>, <code>TARGET</code>, <code>TLS</code>, <code>PHP</code>).</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">open</td>
-              <td class="syntax-col">xabi open [name]</td>
-              <td>Open site URL (<code>http://</code> or <code>https://</code>) in the default system browser.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">tls</td>
-              <td class="syntax-col">xabi tls [name] [--off|--disable]</td>
-              <td>Issue local certificates via <code>mkcert</code> with HTTP 301 redirect, or disable TLS for a site.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">php</td>
-              <td class="syntax-col">xabi php [version | use &lt;ver&gt; | pin &lt;ver&gt;]</td>
-              <td>List detected PHP installations, switch the global version, or write <code>.php-version</code> per project.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">conf</td>
-              <td class="syntax-col">xabi conf [config|nginx|php|sites|&lt;site&gt;] [--path]</td>
-              <td>Open a configuration file in <code>$VISUAL</code>/<code>$EDITOR</code> or print the resolved path with <code>--path</code>.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">log</td>
-              <td class="syntax-col">xabi log [nginx|php|mariadb|&lt;site&gt;] [-n &lt;lines&gt;] [--no-follow] [--access]</td>
-              <td>Stream service or site log files cross-platform.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">share</td>
-              <td class="syntax-col">xabi share [name] [--provider &lt;cloudflared|ngrok&gt;]</td>
-              <td>Expose a local site over a public tunnel via <code>cloudflared</code> or <code>ngrok</code> with host header forwarding.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">db</td>
-              <td class="syntax-col">xabi db [shell [name] | ls | create &lt;name&gt; | drop &lt;name&gt; [--force]]</td>
-              <td>Manage MariaDB/MySQL databases or open an interactive SQL shell without password prompts.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">completion</td>
-              <td class="syntax-col">xabi completion &lt;bash|zsh|fish|powershell&gt;</td>
-              <td>Print shell completion script covering commands, services, and registered sites from <code>xabi ls</code>.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">help</td>
-              <td class="syntax-col">xabi help [command] (-h, --help)</td>
-              <td>Display command overview or usage details for a specific command.</td>
-            </tr>
-            <tr>
-              <td class="cmd-col">version</td>
-              <td class="syntax-col">xabi version (-V, --version)</td>
-              <td>Print the installed <code>xabi</code> binary version.</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table id="cheat-table" class="data-table">
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>Syntax and Flags</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="cmd-col">init</td>
+                <td class="syntax-col">xabi init [--dry-run] [--force]</td>
+                <td>Create XDG directories, <code>config.toml</code>, <code>nginx.conf</code>, MariaDB datadir, Linux <code>setcap</code>, and run <code>mkcert -install</code>.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">doctor</td>
+                <td class="syntax-col">xabi doctor</td>
+                <td>Verify XDG layout, required/optional binaries, ports <code>80</code>/<code>443</code>/<code>3306</code>, hosts file permissions, and <code>cap_net_bind_service</code>.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">up</td>
+                <td class="syntax-col">xabi up [service...]</td>
+                <td>Start <code>nginx</code>, <code>php-fpm</code> / <code>php-cgi</code>, and <code>mariadb</code> idempotently.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">down</td>
+                <td class="syntax-col">xabi down [service...]</td>
+                <td>Stop services in reverse order and remove runtime <code>.pid</code> and <code>.sock</code> files.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">restart</td>
+                <td class="syntax-col">xabi restart [--reload] [service...]</td>
+                <td>Restart services, or perform a graceful reload (<code>SIGHUP</code>/<code>SIGUSR2</code> on Linux, <code>nginx -s reload</code> on Windows).</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">status (st)</td>
+                <td class="syntax-col">xabi status [service...]</td>
+                <td>Display <code>RUNNING</code>/<code>STOPPED</code> state, PID, endpoint, and RSS memory with orphan PID recovery.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">add</td>
+                <td class="syntax-col">xabi add [name] [--proxy &lt;port|host:port&gt;] [--dir &lt;path&gt;] [--php &lt;ver&gt;]</td>
+                <td>Auto-detect Laravel/PHP/static roots or reverse proxy WebSocket upstreams, generate Nginx vhost, and update the hosts file.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">rm</td>
+                <td class="syntax-col">xabi rm &lt;name&gt;</td>
+                <td>Remove site <code>.conf</code>, TLS certificates, <code>sites.toml</code> entry, and hosts file entry.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">ls</td>
+                <td class="syntax-col">xabi ls</td>
+                <td>Print registered sites (<code>DOMAIN</code>, <code>TARGET</code>, <code>TLS</code>, <code>PHP</code>).</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">open</td>
+                <td class="syntax-col">xabi open [name]</td>
+                <td>Open site URL (<code>http://</code> or <code>https://</code>) in the default system browser.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">tls</td>
+                <td class="syntax-col">xabi tls [name] [--off|--disable]</td>
+                <td>Issue local certificates via <code>mkcert</code> with HTTP 301 redirect, or disable TLS for a site.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">php</td>
+                <td class="syntax-col">xabi php [version | use &lt;ver&gt; | pin &lt;ver&gt;]</td>
+                <td>List detected PHP installations, switch the global version, or write <code>.php-version</code> per project.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">conf</td>
+                <td class="syntax-col">xabi conf [config|nginx|php|sites|&lt;site&gt;] [--path]</td>
+                <td>Open a configuration file in <code>$VISUAL</code>/<code>$EDITOR</code> or print the resolved path with <code>--path</code>.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">log</td>
+                <td class="syntax-col">xabi log [nginx|php|mariadb|&lt;site&gt;] [-n &lt;lines&gt;] [--no-follow] [--access]</td>
+                <td>Stream service or site log files cross-platform.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">share</td>
+                <td class="syntax-col">xabi share [name] [--provider &lt;cloudflared|ngrok&gt;]</td>
+                <td>Expose a local site over a public tunnel via <code>cloudflared</code> or <code>ngrok</code> with host header forwarding.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">db</td>
+                <td class="syntax-col">xabi db [shell [name] | ls | create &lt;name&gt; | drop &lt;name&gt; [--force]]</td>
+                <td>Manage MariaDB/MySQL databases or open an interactive SQL shell without password prompts.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">completion</td>
+                <td class="syntax-col">xabi completion &lt;bash|zsh|fish|powershell&gt;</td>
+                <td>Print shell completion script covering commands, services, and registered sites from <code>xabi ls</code>.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">help</td>
+                <td class="syntax-col">xabi help [command] (-h, --help)</td>
+                <td>Display command overview or usage details for a specific command.</td>
+              </tr>
+              <tr>
+                <td class="cmd-col">version</td>
+                <td class="syntax-col">xabi version (-V, --version)</td>
+                <td>Print the installed <code>xabi</code> binary version.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <p id="cheat-empty" class="callout" hidden>No command reference entries match the current search query.</p>
       </section>
 
@@ -768,9 +1106,24 @@ xabi completion fish &gt; ~/.config/fish/completions/xabi.fish</code></pre>
         <li><a class="toc-link" href="#step-7" data-scrollspy="step-7">7. Operational Utilities</a></li>
         <li><a class="toc-link" href="#step-8" data-scrollspy="step-8">8. Command Reference</a></li>
       </ul>
+
+      <div class="toc-meta">
+        <div class="toc-progress-row">
+          <span class="toc-meta-label">Checklist</span>
+          <span id="toc-progress-text" class="toc-meta-value">0 of 7 completed</span>
+        </div>
+        <div class="toc-progress-track" aria-hidden="true">
+          <div id="toc-progress-fill" class="toc-progress-fill"></div>
+        </div>
+        <div class="toc-platform-row">
+          <span class="toc-meta-label">Platform</span>
+          <span class="toc-meta-value os-token" data-win="Windows" data-linux="Linux">Windows</span>
+        </div>
+        <a href="#overview" class="toc-back-top">Back to top &uarr;</a>
+      </div>
     </aside>
   </div>
 
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
